@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ตรวจสอบผลการขึ้นสอบโครงงาน</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #f3f4f6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header-bg {
+            background: linear-gradient(90deg, #1d4ed8, #2563eb);
+            color: #fff;
+            padding: 1rem 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .tab-button {
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .tab-button.active {
+            border-bottom-width: 2px;
+            border-color: #2563eb;
+            color: #1d4ed8;
+            font-weight: 600;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            border-left: 5px solid #2563eb;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .status-badge {
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .badge-green {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-yellow {
+            background-color: #fef9c3;
+            color: #854d0e;
+        }
+
+        .badge-red {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            border-radius: 12px;
+            width: 95%;
+            max-width: 1000px;
+            position: relative;
+            animation: fadeIn 0.3s;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .close-button {
+            color: #fff;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .close-button:hover {
+            color: #f87171;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 flex flex-col min-h-screen">
+    <header class="header-bg">
+        <div class="container mx-auto px-6 flex items-center justify-between">
+            <button id="sidebar-open-btn" class="lg:hidden p-2 text-white focus:outline-none">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7">
+                    </path>
+                </svg>
+            </button>
+            <span class="text-2xl font-bold">ระบบจัดการโครงงาน</span>
+            <div class="flex items-center space-x-4">
+                <span class="text-lg font-medium">ผศ.ดร.นิติการ นาคเจือทอง</span>
+            </div>
+        </div>
+    </header>
+    <div class="grid grid-cols-1 lg:grid-cols-12 flex-grow">
+
+        <aside id="sidebar"
+            class="sidebar lg:relative fixed top-0 left-0 h-full overflow-y-auto z-30 lg:block lg:p-4 bg-white shadow-md flex-grow min-h-screen col-span-2 w-[280px]">
+            <div
+                class="p-4 bg-indigo-700 text-white flex items-center justify-between lg:justify-start lg:rounded-t-lg lg:hidden">
+                <h3 class="text-xl font-bold">เมนู</h3>
+                <button id="sidebar-close-btn" class="lg:hidden text-white text-2xl">&times;</button>
+            </div>
+            <nav class=" bg-white lg:rounded-b-lg">
+                <ul class="space-y-2">
+                    <a href="Project_advisor_dashboard.html"
+                        class="flex items-center p-3 text-white bg-indigo-600 rounded-md transition-colors w-64">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-white" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1" />
+                        </svg>
+                        กลับหน้าหลัก
+                    </a>
+                    <li>
+                        <a href="Project_advisor_dashboard.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 7.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zM7.5 10a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5zM7.5 12.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" />
+                            </svg>
+                            เเดชบอร์ดโครงงานในที่ปรึกษา
+                        </a>
+                    </li>
+                    <li>
+                        <a href="project_list.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 7.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zM7.5 10a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5zM7.5 12.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" />
+                            </svg>
+                            ติดตามสถานะขึ้นสอบหัวข้อ
+                        </a>
+                    </li>
+                    <li>
+                        <a href="Evaluation_topic.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 7.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zM7.5 10a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5zM7.5 12.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" />
+                            </svg>
+                            ประเมินผลการสอบหัวข้อ
+                        </a>
+                    </li>
+                    <li>
+                        <a href="Progress_Check2.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M9 2a1 1 0 00-1 1v2a1 1 0 002 0V3a1 1 0 00-1-1zM5.553 4.847a1 1 0 00-1.414 1.414l1.414 1.414a1 1 0 101.414-1.414L5.553 4.847zM3 9a1 1 0 000 2h2a1 1 0 100-2H3zM4.847 14.447a1 1 0 00-1.414-1.414l-1.414 1.414a1 1 0 101.414 1.414l1.414-1.414zM9 17a1 1 0 00-1 1v2a1 1 0 102 0v-2a1 1 0 00-1-1zM14.447 19.153a1 1 0 001.414-1.414l-1.414-1.414a1 1 0 00-1.414 1.414l1.414 1.414zM17 10a1 1 0 000-2h2a1 1 0 100 2h-2zM19.153 14.447a1 1 0 00-1.414 1.414l1.414 1.414a1 1 0 001.414-1.414l-1.414-1.414z" />
+                            </svg>
+                            ความคืบหน้าโครงงานในที่ปรึกษา
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="Report_success_project.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M2 4a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V4zm2-2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4z"
+                                    clip-rule="evenodd" fill-rule="evenodd" />
+                                <path fill-rule="evenodd"
+                                    d="M7 6a1 1 0 00-1 1v8a1 1 0 102 0V7a1 1 0 00-1-1zM10 6a1 1 0 00-1 1v6a1 1 0 102 0V7a1 1 0 00-1-1zM13 6a1 1 0 00-1 1v4a1 1 0 102 0V7a1 1 0 00-1-1z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            สรุปผลการขึ้นสอบโครงงานจบ
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="../Director/dashbroad_director.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M2 4a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V4zm2-2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4z"
+                                    clip-rule="evenodd" fill-rule="evenodd" />
+                                <path fill-rule="evenodd"
+                                    d="M7 6a1 1 0 00-1 1v8a1 1 0 102 0V7a1 1 0 00-1-1zM10 6a1 1 0 00-1 1v6a1 1 0 102 0V7a1 1 0 00-1-1zM13 6a1 1 0 00-1 1v4a1 1 0 102 0V7a1 1 0 00-1-1z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            เเดชบอร์ดคณะกรรมการสอบ
+                        </a>
+                    </li>
+
+
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="flex-grow p-8 col-span-10">
+            <div class="container mx-auto">
+                <div class="flex border-b border-gray-300 mb-6">
+
+                    <a href="Check_week_teacher_subject.html"
+                        class="tab-button py-3 px-6 text-center text-gray-500 font-medium">
+                        หน้าแสดงความคืบหน้าโครงงาน
+                    </a>
+                    <a href="Project_advisor_dashboard.html"
+                        class="tab-button py-3 px-6 text-center text-gray-500 font-medium">
+                        หน้าเเดชบอร์ดอาจารย์ที่ปรึกษา
+                    </a>
+                    <a href="../Director/dashbroad_director.html"
+                        class="tab-button py-3 px-6 text-center text-gray-500 font-medium">
+                        หน้าเเดชบอร์ดคณะกรรมการสอบโครงงาน
+                    </a>
+                    <button id="finalExamTab" onclick="showFinalExamStatus()"
+                        class="tab-button active py-3 px-6 text-center text-blue-700 font-bold border-b-2 border-blue-700 -mb-px">
+                        หน้าแสดงสถานะการขึ้นสอบจบ
+                    </button>
+                </div>
+
+                <div class="container mx-auto">
+                    <h1 class="text-4xl font-bold text-gray-800 text-center my-10">ตรวจสอบผลการขึ้นสอบโครงงานจบ 100%
+                    </h1>
+
+                    <div class="card-container">
+                        <div
+                            class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-4 mb-6">
+                            <div class="w-full md:w-1/2">
+                                <input type="text" id="search" placeholder="ค้นหาชื่อโครงงาน"
+                                    class="w-full border rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                        </div>
+
+                        <div
+                            class="mb-6 space-y-4 md:space-y-0 md:space-x-6 flex flex-col md:flex-row items-start md:items-center">
+                            <p class="font-semibold text-gray-700">ผลการประเมินล่าสุด:</p>
+                            <div class="flex items-center space-x-4">
+                                <label class="flex items-center">
+                                    <input type="radio" name="evaluation-date" value="3days"
+                                        class="h-4 w-4 text-blue-600">
+                                    <span class="ml-2">3 วันล่าสุด</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="evaluation-date" value="1week"
+                                        class="h-4 w-4 text-blue-600">
+                                    <span class="ml-2">1 สัปดาห์ล่าสุด</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="evaluation-date" value="current" checked
+                                        class="h-4 w-4 text-blue-600">
+                                    <span class="ml-2">ทั้งหมด</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <label for="status-filter"
+                                class="block font-semibold text-gray-700 mb-2">เลือกสถานะ:</label>
+                            <select id="status-filter"
+                                class="w-full md:w-1/3 border rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="all">ทั้งหมด</option>
+                                <option value="passed">ผ่านการขึ้นสอบโครงงาน</option>
+                                <option value="failed">ไม่ผ่านการขึ้นสอบจบโครงงาน</option>
+                                <option value="revised">ผ่านแบบแก้ไข</option>
+                            </select>
+                        </div>
+
+                        <div id="project-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer id="main-footer" class="bg-gradient-to-r from-blue-800 to-blue-900 text-white py-4 mt-auto shadow-lg">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <p class="font-bold text-sm md:text-base">ระบบยื่นสอบโครงงานพิเศษและโครงงานสหกิจ</p>
+                <span class="hidden md:inline text-blue-200">|</span>
+                <p class="text-blue-200 text-xs md:text-sm">ภาควิชาเทคโนโลยีสารสนเทศ มจพ. วิทยาเขตปราจีน</p>
+            </div>
+            <p class="text-xs md:text-sm text-blue-100 font-semibold">จัดทำโดย: นายกัณติกรณ์ สรสุริยวงษ์ และ นายพีรพล
+                บัวขยาย</p>
+        </div>
+        <hr class="border-blue-700 my-2 opacity-70">
+        <p class="text-center text-xs text-blue-300">
+            &copy; 2025 King Mongkut's University of Technology North Bangkok. All Rights Reserved.
+        </p>
+    </footer>
+
+    <div id="projectModal" class="modal">
+        <div class="modal-content">
+            <div
+                class="bg-gradient-to-r from-blue-700 to-blue-900 text-white px-6 py-5 flex justify-between items-center shadow-md rounded-t-lg">
+                <h2 class="text-2xl font-bold">รายละเอียดโครงงาน</h2>
+                <span class="close-button">&times;</span>
+            </div>
+            <div class="p-6 space-y-6">
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-2">
+                            <p class="text-blue-700 font-bold">วันที่เข้าสอบโครงงานจบ 100%: <span id="modal-exam-date"
+                                    class="text-gray-800 font-normal"></span></p>
+                            <p><span class="font-bold text-gray-800">ชื่อโครงงาน (TH):</span> <span
+                                    id="modal-project-name-th"></span></p>
+                            <p><span class="font-bold text-gray-800">ชื่อโครงงาน (EN):</span> <span
+                                    id="modal-project-name-en"></span></p>
+                            <p><span class="font-bold text-gray-800">ผู้จัดทำ:</span> <span id="modal-students"></span>
+                            </p>
+                            <p><span class="font-bold text-gray-800">อาจารย์ที่ปรึกษา:</span> <span
+                                    id="modal-advisor"></span></p>
+                            <p><span class="font-bold text-gray-800">อาจารย์ที่ปรึกษาร่วม:</span> <span
+                                    id="modal-co-advisor"></span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <h3 class="font-bold text-gray-800 mb-2">ผลการประเมินจากคณะกรรมการ</h3>
+                    <div id="evaluation-status-container" class="space-y-2"></div>
+                </div>
+
+            </div>
+            <div class="border-t border-gray-200 p-4 text-center">
+                <h3 class="text-lg font-bold" id="modal-status-text"></h3>
+                <h4 class="text-sm text-gray-600" id="modal-status-date"></h4>
+                <div id="final-status-badge" class="mt-2 mx-auto w-fit"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const projects = [
+            {
+                id: 1,
+                nameTH: 'ระบบจัดการห้องสมุดดิจิทัลด้วยเทคโนโลยี Blockchain',
+                nameEN: 'Digital Library Management System with Blockchain Technology',
+                students: ['นายธนบูลย์ อิ่มเจริญ (6806022510017)', 'นายวัชโรทัย เลิศวิลัย (6806022510025)'],
+                advisor: 'ผศ.ดร.นิติการ นาคเจือทอง',
+                coAdvisor: 'อ.ดร.กาญจน ณ ศรีธะ',
+                status: 'passed',
+                date: '2568-09-17 10:30',
+                evaluation: [
+                    { name: 'ผศ.ดร.บีสุดา ดาวเรือง', role: 'ประธานกรรมการ', result: 'ผ่าน', comments: 'นำเสนอได้ดีเยี่ยม เนื้อหาครบถ้วน' },
+                    { name: 'ผศ.นพดล บูรณ์กุศล', role: 'กรรมการ', result: 'ผ่าน', comments: 'การทำงานของระบบเป็นไปตามที่เสนอ' },
+                    { name: 'อ.นิรันดร์ ใจเย็น', role: 'กรรมการ', result: 'ผ่าน', comments: null },
+                    { name: 'อ.สุดา รักษ์ดี', role: 'กรรมการ', result: 'ผ่าน', comments: null }
+                ]
+            },
+            {
+                id: 2,
+                nameTH: 'การวิเคราะห์ข้อมูลขนาดใหญ่เพื่อพยากรณ์ยอดขายสินค้า',
+                nameEN: 'Big Data Analysis for Sales Forecasting',
+                students: ['นายพลากร แพทย์นุเคราะห์ (6806022510092)', 'นายวุฒิพงษ์ วังรัตน์ (6806022510106)'],
+                advisor: 'ผศ.นพดล บูรณ์กุศล',
+                coAdvisor: 'ไม่มี',
+                status: 'revised',
+                date: '2568-09-16 14:30',
+                evaluation: [
+                    { name: 'ผศ.ดร.บีสุดา ดาวเรือง', role: 'ประธานกรรมการ', result: 'ผ่านแบบแก้ไข', comments: 'โปรดปรับปรุงโมเดลการวิเคราะห์ข้อมูลให้แม่นยำยิ่งขึ้น' },
+                    { name: 'ผศ.นพดล บูรณ์กุศล', role: 'กรรมการ', result: 'ผ่านแบบแก้ไข', comments: null },
+                    { name: 'อ.นิรันดร์ ใจเย็น', role: 'กรรมการ', result: 'ผ่านแบบแก้ไข', comments: 'แก้ไขรายงานบทที่ 4 ให้สมบูรณ์' },
+                    { name: 'อ.สุดา รักษ์ดี', role: 'กรรมการ', result: 'ผ่านแบบแก้ไข', comments: null }
+                ]
+            },
+            {
+                id: 3,
+                nameTH: 'การพัฒนาแอปพลิเคชันสำหรับติดตามสุขภาพผู้สูงอายุ',
+                nameEN: 'Mobile Application Development for Elderly Health Monitoring',
+                students: ['นายขรรค์ชัย ลิ้มประเสริฐ (6806022510033)', 'นางสาวกนกวรรณ ศรีประไชย (6806022510041)'],
+                advisor: 'ผศ.ดร.ขนิษฐา นามี',
+                coAdvisor: 'ผศ.นิมิต ศรีคำทา',
+                status: 'failed',
+                date: '2568-09-15 09:00',
+                evaluation: [
+                    { name: 'ผศ.ดร.บีสุดา ดาวเรือง', role: 'ประธานกรรมการ', result: 'ไม่ผ่าน', comments: 'เนื่องจากความไม่สมบูรณ์ของระบบและไม่สามารถทดสอบตามที่เสนอได้' },
+                    { name: 'ผศ.นพดล บูรณ์กุศล', role: 'กรรมการ', result: 'ไม่ผ่าน', comments: null },
+                    { name: 'อ.นิรันดร์ ใจเย็น', role: 'กรรมการ', result: 'ไม่ผ่าน', comments: 'ฟังก์ชันการทำงานยังไม่ครบถ้วน' },
+                    { name: 'อ.สุดา รักษ์ดี', role: 'กรรมการ', result: 'ไม่ผ่าน', comments: null }
+                ]
+            },
+        ];
+
+        const container = document.getElementById('project-cards-container');
+        const searchInput = document.getElementById('search');
+        const statusFilter = document.getElementById('status-filter');
+        const dateFilters = document.querySelectorAll('input[name="evaluation-date"]');
+        const modal = document.getElementById("projectModal");
+        const closeModalBtn = document.querySelector(".close-button");
+        const footer = document.getElementById("main-footer");
+
+        function renderProjectCard(project) {
+            const statusText = {
+                passed: 'ผ่านการสอบจบโครงงานโดยสมบูรณ์',
+                revised: 'ผ่านแบบแก้ไข',
+                failed: 'ไม่ผ่านการสอบจบโครงงาน'
+            };
+            const badgeClass = {
+                passed: 'badge-green',
+                revised: 'badge-yellow',
+                failed: 'badge-red'
+            };
+            const statusIcon = {
+                passed: '<i class="fas fa-check-circle"></i>',
+                revised: '<i class="fas fa-exclamation-circle"></i>',
+                failed: '<i class="fas fa-times-circle"></i>'
+            };
+
+            return `<div class="card p-6 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center space-x-2 mb-3">
+                                <span class="status-badge ${badgeClass[project.status]}">
+                                    ${statusIcon[project.status]}
+                                    <span>${statusText[project.status]}</span>
+                                </span>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">${project.nameTH}</h3>
+                            <p class="text-gray-600 mb-1"><span class="font-medium">ผู้จัดทำ:</span> ${project.students.join(', ')}</p>
+                            <p class="text-gray-600 mb-1"><span class="font-medium">อาจารย์ที่ปรึกษา:</span> ${project.advisor}</p>
+                            <p class="text-gray-600 mb-4"><span class="font-medium">อาจารย์ที่ปรึกษาร่วม:</span> ${project.coAdvisor}</p>
+                        </div>
+                        <button class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300 mt-4 self-start" onclick="showModal(${project.id})">
+                            ดูรายละเอียด
+                        </button>
+                    </div>`;
+        }
+
+        function filterProjects() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedStatus = statusFilter.value;
+            return projects.filter(project => {
+                const matchesSearch = project.nameTH.toLowerCase().includes(searchTerm) || project.nameEN.toLowerCase().includes(searchTerm);
+                const matchesStatus = selectedStatus === 'all' || project.status === selectedStatus;
+                return matchesSearch && matchesStatus;
+            });
+        }
+
+        function renderCards() {
+            const filteredProjects = filterProjects();
+            container.innerHTML = filteredProjects.map(renderProjectCard).join('');
+        }
+
+        function showModal(projectId) {
+            const project = projects.find(p => p.id === projectId);
+            if (project) {
+                const statusText = {
+                    passed: 'ผ่านการสอบจบโครงงานโดยสมบูรณ์',
+                    revised: 'ผ่านแบบแก้ไข',
+                    failed: 'ไม่ผ่านการสอบจบโครงงาน'
+                };
+                const badgeClass = {
+                    passed: 'badge-green',
+                    revised: 'badge-yellow',
+                    failed: 'badge-red'
+                };
+                const statusIcon = {
+                    passed: '<i class="fas fa-check-circle"></i>',
+                    revised: '<i class="fas fa-exclamation-circle"></i>',
+                    failed: '<i class="fas fa-times-circle"></i>'
+                };
+                const evaluationBadgeClass = {
+                    'ผ่าน': 'bg-green-100 text-green-700',
+                    'ผ่านแบบแก้ไข': 'bg-yellow-100 text-yellow-700',
+                    'ไม่ผ่าน': 'bg-red-100 text-red-700'
+                };
+
+                document.getElementById("modal-project-name-th").textContent = project.nameTH;
+                document.getElementById("modal-project-name-en").textContent = project.nameEN;
+                document.getElementById("modal-students").textContent = project.students.join(', ');
+                document.getElementById("modal-advisor").textContent = project.advisor;
+                document.getElementById("modal-co-advisor").textContent = project.coAdvisor;
+
+                document.getElementById("modal-exam-date").textContent = project.date;
+
+                const evaluationStatusContainer = document.getElementById("evaluation-status-container");
+                evaluationStatusContainer.innerHTML = project.evaluation.length > 0
+                    ? project.evaluation.map(eval => {
+                        const commentHtml = eval.comments ? `<p class="text-sm text-gray-500 mt-1 pl-4 border-l-2 border-gray-300">${eval.comments}</p>` : '';
+                        return `<div class="p-3 bg-white rounded shadow-sm border border-gray-200">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="font-semibold text-gray-800">${eval.name}</span>
+                                            <span class="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded-full">${eval.role}</span>
+                                        </div>
+                                        <span class="font-bold text-sm px-2 py-1 rounded-full ${evaluationBadgeClass[eval.result]}">
+                                            ${eval.result}
+                                        </span>
+                                    </div>
+                                    ${commentHtml}
+                                </div>`;
+                    }).join('')
+                    : '<p class="text-gray-500 text-sm">ยังไม่มีผลการประเมิน</p>';
+
+                // Update final status text and badge
+                document.getElementById("modal-status-text").textContent = `สถานะการสอบ:`;
+                document.getElementById("modal-status-date").textContent = `วันที่: ${project.date}`;
+
+                const finalBadge = document.getElementById("final-status-badge");
+                finalBadge.innerHTML = `<span class="status-badge ${badgeClass[project.status]}">
+                    ${statusIcon[project.status]}
+                    <span>${statusText[project.status]}</span>
+                </span>`;
+
+                // Change footer color if status is 'passed'
+                if (project.status === 'passed') {
+                    footer.classList.remove('bg-gradient-to-r', 'from-blue-800', 'to-blue-900');
+                    footer.classList.add('bg-gradient-to-r', 'from-green-800', 'to-green-900');
+                } else {
+                    footer.classList.remove('bg-gradient-to-r', 'from-green-800', 'to-green-900');
+                    footer.classList.add('bg-gradient-to-r', 'from-blue-800', 'to-blue-900');
+                }
+
+                modal.style.display = "flex";
+            }
+        }
+
+        closeModalBtn.onclick = () => modal.style.display = "none";
+        window.onclick = event => { if (event.target == modal) modal.style.display = "none"; };
+        searchInput.addEventListener('input', renderCards);
+        statusFilter.addEventListener('change', renderCards);
+        document.addEventListener('DOMContentLoaded', renderCards);
+        document.addEventListener('DOMContentLoaded', function() {
+    // Get the sidebar and the open/close buttons
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOpenBtn = document.getElementById('sidebar-open-btn'); // Add a button to open the sidebar
+    const sidebarCloseBtn = document.getElementById('sidebar-close-btn');
+
+    // Function to open the sidebar
+    function openSidebar() {
+        sidebar.classList.remove('-left-full'); // Or whichever class you use to hide it
+        sidebar.classList.add('left-0');
+    }
+
+    // Function to close the sidebar
+    function closeSidebar() {
+        sidebar.classList.remove('left-0');
+        sidebar.classList.add('-left-full'); // Or whichever class you use to hide it
+    }
+
+    // Add a click event to the close button
+    if (sidebarCloseBtn) {
+        sidebarCloseBtn.addEventListener('click', closeSidebar);
+    }
+    
+    // Add a click event to an open button (you'll need to add this to your HTML)
+    if (sidebarOpenBtn) {
+        sidebarOpenBtn.addEventListener('click', openSidebar);
+    }
+
+    // แก้ไข: ปรับโค้ดการปิด sidebar เมื่อคลิกนอกพื้นที่
+    // เพิ่มเงื่อนไขว่าโค้ดนี้จะทำงานเฉพาะบนหน้าจอขนาดเล็กกว่า 1024px เท่านั้น
+    window.addEventListener('click', function(event) {
+        if (window.innerWidth < 1024) { // ตรวจสอบขนาดหน้าจอ
+            if (!sidebar.contains(event.target) && !event.target.closest('#sidebar-open-btn')) {
+                closeSidebar();
+            }
+        }
+    });
+
+    // Add responsive behavior based on screen size
+    function handleResize() {
+        if (window.innerWidth >= 1024) { // Tailwind's 'lg' breakpoint
+            sidebar.classList.remove('fixed', '-left-full');
+            sidebar.classList.add('relative', 'left-0');
+        } else {
+            sidebar.classList.remove('relative', 'left-0');
+            sidebar.classList.add('fixed', '-left-full');
+        }
+    }
+
+    // Run on page load and on window resize
+    handleResize();
+    window.addEventListener('resize', handleResize);
+});
+    </script>
+
+</body>
+
+</html>

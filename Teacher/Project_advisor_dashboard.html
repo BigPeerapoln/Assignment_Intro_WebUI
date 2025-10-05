@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หน้าอาจารย์ที่ปรึกษาโครงงาน</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .card {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative; /* For positioning the button */
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 25px rgba(0,0,0,0.15);
+        }
+        .card-icon {
+            width: 4.5rem;
+            height: 4.5rem;
+            margin-bottom: 1rem;
+        }
+        .card-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 1rem; /* Added space for the button */
+        }
+        .card.project-list .card-number { color: #2563eb; } /* Blue */
+        .card.exam-schedule .card-number { color: #16a34a; } /* Green */
+        .card.progress-report .card-number { color: #d97706; } /* Amber */
+
+        .view-button {
+            padding: 0.5rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-decoration: none;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+        .view-button.blue {
+            background-color: #2563eb;
+            color: white;
+        }
+        .view-button.blue:hover {
+            background-color: #1d4ed8;
+            transform: scale(1.05);
+        }
+        .view-button.green {
+            background-color: #16a34a;
+            color: white;
+        }
+        .view-button.green:hover {
+            background-color: #15803d;
+            transform: scale(1.05);
+        }
+        .view-button.amber {
+            background-color: #d97706;
+            color: white;
+        }
+        .view-button.amber:hover {
+            background-color: #b45309;
+            transform: scale(1.05);
+        }
+
+        .summary-card {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .summary-item {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            background-color: #f8fafc;
+        }
+        .summary-item.blue {
+    background-color: #eff6ff; /* พื้นหลังสีฟ้าอ่อน */
+}
+
+.summary-item.blue .number {
+    color: #2563eb; /* ตัวเลขสีน้ำเงินเข้ม */
+}
+
+        .summary-item .number {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        .summary-item .label {
+            font-size: 1rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+        /* Summary item colors (corrected) */
+        .summary-item.pending .number { color: #ef4444; } /* Red */
+        .summary-item.success .number { color: #22c55e; } /* Green */
+        .summary-item.warning .number { color: #eab308; } /* Yellow */
+
+          .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            /* เพื่อทำพื้นหลังทึบแสง */
+        }
+
+        .alert-modal-card {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            text-align: center;
+            max-width: 400px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+  <header class="bg-blue-900 shadow-md py-5">
+    <div class="container mx-auto px-6 flex items-center justify-between">
+        <span class="text-2xl font-bold text-white">ระบบการจัดการข้อมูลโครงงานพิเศษ และโครงงานสหกิจ</span>
+        <div class="flex items-center space-x-4">
+            <span class="text-white text-lg font-medium">ผศ.ดร นิติการ นาคเจือทอง</span>
+            <a href="#" class="text-white hover:text-gray-300 transition duration-300">
+                <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+            </a>
+        </div>
+    </div>
+</header>
+
+    <div class="container mx-auto px-6 mt-6">
+        <div class="card mb-8 p-8 text-left">
+            <h2 class="text-3xl font-bold mb-3">ชื่ออาจารย์: ผศ.ดร.นิติการ นาคเจือทอง</h2>
+            <p class="text-xl text-gray-800 mb-2"><span class="font-semibold">คณะ:</span> เทคโนโลยีเเละการจัดการอุตสาหกรรม</p>
+            <p class="text-xl text-gray-800 mb-2"><span class="font-semibold">ภาควิชา:</span> เทคโนโลยีสารสนเทศ</p>
+            <p class="text-xl text-gray-800"><span class="font-semibold">สาขา:</span> วิศวกรรมสารสนเทศเเละเครือข่าย</p>
+        </div>
+    </div>
+
+    <main class="flex-grow p-6">
+        <div class="container mx-auto">
+            <h1 class="text-4xl font-bold text-gray-800 mb-8">แดชบอร์ดอาจารย์ที่ปรึกษาโครงงาน</h1>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="card project-list">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="card-icon text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="12" y1="18" x2="12" y2="12"></line>
+                        <line x1="9" y1="15" x2="15" y2="15"></line>
+                    </svg>
+                    <div class="card-number">4 รายการ</div>
+                    <div class="card-title">รายการโครงงานที่ปรึกษา</div>
+                    <a href="project_list.html" class="view-button blue">ดูข้อมูล</a>
+                </div>
+                
+                <div class="card exam-schedule">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="card-icon text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-8.6"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    <div class="card-number">3 รายการ</div>
+                    <div class="card-title">ตารางสอบหัวข้อโครงงาน</div>
+                    <a href="schedule_project_list.html" class="view-button green">ดูข้อมูล</a>
+                </div>
+
+                <div class="card progress-report">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="card-icon text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <div class="card-number">5 รายการ</div>
+                    <div class="card-title">รายงานความคืบหน้า (รอตรวจ)</div>
+                    <a href="weekly_progress.html" class="view-button amber">ดูข้อมูล</a>
+                </div>
+            </div>
+
+            <div class="mt-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">สรุปสถานะภาพรวมโครงงาน</h2>
+                <div class="summary-card">
+                    <h3 class="text-2xl font-semibold text-gray-700 mb-4">สถานะการสอบหัวข้อโครงงาน</h3>
+                    <div class="summary-grid">
+                        <div class="summary-item blue">
+                            <div class="number">4</div>
+                            <div class="label">โครงงานที่รอขึ้นสอบหัวข้อ</div>
+                        </div>
+                        <div class="summary-item success">
+                            <div class="number">3</div>
+                            <div class="label">โครงงานที่สอบหัวข้อสำเร็จ</div>
+                        </div>
+                        <div class="summary-item warning">
+                            <div class="number">0</div>
+                            <div class="label">โครงงานที่แก้ไขหัวข้อและขึ้นสอบใหม่</div>
+                        </div>
+                        <div class="summary-item pending">
+                            <div class="number">0</div>
+                            <div class="label">โครงงานที่ไม่ผ่านการสอบหัวข้อ</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-card mt-6">
+                    <h3 class="text-2xl font-semibold text-gray-700 mb-4">สถานะการสอบโครงงานจบ</h3>
+                    <div class="summary-grid">
+                        <div class="summary-item blue">
+                            <div class="number">0</div>
+                            <div class="label">โครงงานที่พร้อมขึ้นสอบจบ</div>
+                        </div>
+                        <div class="summary-item success">
+                            <div class="number">0</div>
+                            <div class="label">โครงงานที่สอบจบเสร็จสิ้น</div>
+                        </div>
+                        <div class="summary-item warning">
+                            <div class="number">0</div>
+                            <div class="label">โครงงานที่สอบจบไม่ผ่าน</div>
+                        </div>
+                        <div class="summary-item pending">
+                            <div class="number">0</div>
+                            <div class="label">โครงงานที่สอบผ่านแต่แก้ไข</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+     <footer class="bg-gradient-to-r from-blue-800 to-blue-900 text-white py-4 mt-auto shadow-lg">
+    <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-center md:text-left space-y-2 md:space-y-0">
+        <div class="flex items-center space-x-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            </svg>
+            <p class="font-bold text-sm md:text-base">ระบบยื่นสอบโครงงานพิเศษและโครงงานสหกิจ</p>
+            <span class="hidden md:inline text-blue-200 text-xs md:text-sm">|</span>
+            <p class="text-blue-200 text-xs md:text-sm">ภาควิชาเทคโนโลยีสารสนเทศ มจพ. วิทยาเขตปราจีน</p>
+        </div>
+
+        <div class="text-xs md:text-sm text-center md:text-right">
+            <p class="font-semibold text-blue-100">จัดทำโดย: นายกัณติกรณ์ สรสุริยวงษ์ และ นายพีรพล บัวขยาย</p>
+        </div>
+    </div>
+    
+    <hr class="border-blue-700 my-2 opacity-70">
+    
+    <p class="text-center text-xs text-blue-300">
+        &copy; 2025 King Mongkut's University of Technology North Bangkok. All Rights Reserved.
+    </p>
+</footer>
+
+    <div id="logoutAlert" class="modal hidden">
+        <div class="alert-modal-card">
+            <div class="flex flex-col items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-red-500 mx-auto mb-4" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                    </path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">ยืนยันการออกจากระบบ</h3>
+                <p class="text-gray-600 mb-6">คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?</p>
+                <div class="flex space-x-4 w-full">
+                    <button onclick="confirmLogout()"
+                        class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-md transition-colors duration-200">
+                        ยืนยัน
+                    </button>
+                    <button onclick="closeModal('logoutAlert')"
+                        class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 rounded-md transition-colors duration-200">
+                        ยกเลิก
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+       <script>
+        // Function to show the modal by removing the 'hidden' class
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+
+        // Function to close the modal by adding the 'hidden' class
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // Function to handle the logout confirmation
+        function confirmLogout() {
+            // Redirect the user to the login page
+            window.location.href = '../index.html';
+        }
+
+        // Get the logout link element
+        const logoutLink = document.querySelector('a[href="#"]');
+
+        // Add a click event listener to the logout link
+        if (logoutLink) {
+            logoutLink.addEventListener('click', function (event) {
+                // Prevent the default link behavior (e.g., jumping to the top of the page)
+                event.preventDefault();
+                // Show the logout confirmation modal
+                showModal('logoutAlert');
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ตรวจสอบความคืบหน้ารายสัปดาห์</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .header-bg {
+            background-color: #1a237e;
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-container {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .project-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            border: 2px solid transparent;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+            padding: 2rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-view-details {
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+            display: block;
+            text-align: center;
+        }
+
+        .btn-view-details:hover {
+            background-color: #2563eb;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .status-badge.pending {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-badge.reviewed {
+            background-color: #dcfce7;
+            color: #16a34a;
+        }
+
+        .status-badge.reviewed_by_prof {
+            background-color: #93c5fd;
+            color: #1d4ed8;
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: #e5e7eb;
+            border-radius: 9999px;
+            overflow: hidden;
+            height: 1rem;
+            margin-top: 1rem;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            transition: width 0.5s ease-in-out;
+            border-radius: 9999px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent);
+            background-size: 1rem 1rem;
+            animation: move-stripes 2s linear infinite;
+        }
+
+        .progress-fill.current {
+            background-color: #3b82f6;
+        }
+
+        .progress-fill.previous {
+            background-color: #e5e7eb;
+        }
+
+        .progress-fill.completed {
+            background-color: #22c55e;
+        }
+
+        @keyframes move-stripes {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 1rem 0;
+            }
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            animation: slideIn 0.4s ease-out;
+        }
+
+        .modal-header {
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-close-btn {
+            float: right;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #aaa;
+            transition: color 0.3s;
+        }
+
+        .modal-close-btn:hover,
+        .modal-close-btn:focus {
+            color: #333;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen">
+    <header class="header-bg bg-blue-800 shadow-md p-4">
+        <div class="container mx-auto px-6 flex items-center justify-between">
+            <button id="sidebar-open-btn" class="lg:hidden p-2 text-white focus:outline-none">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7">
+                    </path>
+                </svg>
+            </button>
+            <span class="text-2xl font-bold text-white">ตรวจสอบความคืบหน้ารายสัปดาห์</span>
+            <div class="flex items-center space-x-4">
+                <span class="text-lg font-medium text-white">ผศ.ดร.นิติการ นาคเจือทอง</span>
+
+            </div>
+        </div>
+    </header>
+
+    <div id="logoutAlert" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40 hidden">
+        <div class="alert-modal-card bg-white p-8 rounded-lg shadow-lg max-w-sm w-full mx-4 text-center">
+            <svg id="logoutIcon" class="mx-auto text-red-500 w-16 h-16 mb-4" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h3 id="logoutTitle" class="text-2xl font-bold text-gray-800 mb-2">ยืนยันการออกจากระบบ?</h3>
+            <p id="logoutMessage" class="text-gray-600">คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ</p>
+            <div class="flex justify-center space-x-4 mt-6">
+                <button onclick="confirmLogout()"
+                    class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200">
+                    ยืนยัน
+                </button>
+                <button onclick="hideLogoutAlert()"
+                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md transition-colors duration-200">
+                    ยกเลิก
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 flex-grow">
+
+        <aside id="sidebar"
+            class="sidebar lg:relative fixed top-0 left-0 h-full overflow-y-auto z-30 lg:block lg:p-4 bg-white shadow-md flex-grow min-h-screen col-span-2 w-[290px]">
+            <div
+                class="p-4 bg-indigo-700 text-white flex items-center justify-between lg:justify-start lg:rounded-t-lg lg:hidden">
+                <h3 class="text-xl font-bold">เมนู</h3>
+                <button id="sidebar-close-btn" class="lg:hidden text-white text-2xl">&times;</button>
+            </div>
+            <nav class="p-4 bg-white lg:rounded-b-lg">
+                <ul class="space-y-2">
+                    <a href="Dashbroad_teacher.html"
+                        class="flex items-center p-3 text-white bg-indigo-600 rounded-md transition-colors w-64">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-white" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1" />
+                        </svg>
+                        กลับหน้าหลัก
+                    </a>
+                    <li>
+                        <a href="Showdata_register_project.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 7.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zM7.5 10a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5zM7.5 12.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" />
+                            </svg>
+                            เเสดงข้อมูลโครงงานรายวิชา
+                        </a>
+                    </li>
+                    <li>
+                        <a href="Check_week_teacher_subject.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 7.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zM7.5 10a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5zM7.5 12.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" />
+                            </svg>
+                            ความคืบหน้าโครงงานรายวิชา
+                        </a>
+                    </li>
+                    <li>
+                        <a href="Report_Evaluation_final.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 7.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zM7.5 10a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5zM7.5 12.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" />
+                            </svg>
+                            ตรวจสอบผลการขึ้นสอบโครงงานจบ
+                        </a>
+                    </li>
+                    <li>
+                        <a href="Project_advisor_dashboard.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M9 2a1 1 0 00-1 1v2a1 1 0 002 0V3a1 1 0 00-1-1zM5.553 4.847a1 1 0 00-1.414 1.414l1.414 1.414a1 1 0 101.414-1.414L5.553 4.847zM3 9a1 1 0 000 2h2a1 1 0 100-2H3zM4.847 14.447a1 1 0 00-1.414-1.414l-1.414 1.414a1 1 0 101.414 1.414l1.414-1.414zM9 17a1 1 0 00-1 1v2a1 1 0 102 0v-2a1 1 0 00-1-1zM14.447 19.153a1 1 0 001.414-1.414l-1.414-1.414a1 1 0 00-1.414 1.414l1.414 1.414zM17 10a1 1 0 000-2h2a1 1 0 100 2h-2zM19.153 14.447a1 1 0 00-1.414 1.414l1.414 1.414a1 1 0 001.414-1.414l-1.414-1.414z" />
+                            </svg>
+                            เเดชบอร์ดอาจารย์ที่ปรึกษาโครงงาน
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="../Director/dashbroad_director.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M2 4a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V4zm2-2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4z"
+                                    clip-rule="evenodd" fill-rule="evenodd" />
+                                <path fill-rule="evenodd"
+                                    d="M7 6a1 1 0 00-1 1v8a1 1 0 102 0V7a1 1 0 00-1-1zM10 6a1 1 0 00-1 1v6a1 1 0 102 0V7a1 1 0 00-1-1zM13 6a1 1 0 00-1 1v4a1 1 0 102 0V7a1 1 0 00-1-1z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            เเดชบอร์ดคณะกรรมการสอบ
+                        </a>
+                    </li>
+
+
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="flex-grow p-8 col-span-10">
+            <div class="container mx-auto">
+                <div class="flex border-b border-gray-300 mb-6">
+                    <button id="pendingTab" onclick="showPendingTable()"
+                        class="tab-button active py-3 px-6 text-center text-blue-700 font-bold border-b-2 border-blue-700 -mb-px">
+                        หน้าแสดงข้อมูลโครงงาน
+                    </button>
+                    <button id="approvedTab" onclick="showApprovedTable()"
+                        class="tab-button py-3 px-6 text-center text-gray-500 font-medium">
+                        หน้าแสดงข้อมูลที่อนุมัติ
+                    </button>
+                    <a href="Check_week_teacher_subject.html"
+                        class="tab-button py-3 px-6 text-center text-gray-500 font-medium">
+                        หน้าแสดงความคืบหน้าโครงงาน
+                    </a>
+                    <a href="Project_advisor_dashboard.html"
+                        class="tab-button py-3 px-6 text-center text-gray-500 font-medium">
+                        หน้าเเดชบอร์ดอาจารย์ที่ปรึกษา
+                    </a>
+                    <a href="../Director/dashbroad_director.html"
+                        class="tab-button py-3 px-6 text-center text-gray-500 font-medium">
+                        หน้าเเดชบอร์ดคณะกรรมการสอบโครงงาน
+                    </a>
+
+
+
+
+                </div>
+
+                <div class="filter-container mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                        <div>
+                            <label for="search-box"
+                                class="block text-gray-700 font-semibold mb-2">ค้นหาชื่อโครงงาน:</label>
+                            <input type="text" id="search-box" placeholder="ค้นหาชื่อโครงงาน..."
+                                class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                onkeyup="filterProjects()">
+                        </div>
+                        <div>
+                            <label for="sec-filter" class="block text-gray-700 font-semibold mb-2">เลือก Sec
+                                ที่ดูแล:</label>
+                            <select id="sec-filter"
+                                class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                onchange="filterProjects()">
+                                <option value="all">ทั้งหมด</option>
+                                <option value="1">Sec 1</option>
+                                <option value="2">Sec 2</option>
+                                <option value="3">Sec 3</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="week-filter" class="block text-gray-700 font-semibold mb-2">สัปดาห์:</label>
+                            <select id="week-filter"
+                                class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                onchange="filterProjects()">
+                                <option value="all">ทั้งหมด</option>
+                                <option value="1">สัปดาห์ที่ 1</option>
+                                <option value="2">สัปดาห์ที่ 2</option>
+                                <option value="3">สัปดาห์ที่ 3</option>
+                                <option value="4">สัปดาห์ที่ 4</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="status-filter"
+                                class="block text-gray-700 font-semibold mb-2">กรองตามสถานะ:</label>
+                            <select id="status-filter"
+                                class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                onchange="filterProjects()">
+                                <option value="all">ทั้งหมด</option>
+                                <option value="pending">รอการตรวจสอบ</option>
+                                <option value="reviewed">ตรวจสอบเสร็จสิ้น</option>
+                                <option value="reviewed_by_prof">ตรวจสอบโดยอาจารย์ประจำรายวิชา</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="toggleView()" id="toggle-view-btn"
+                                class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">
+                                เปลี่ยนรูปแบบการดูเป็นตาราง
+                            </button>
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="exportToExcel()"
+                                class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">
+                                <i class="fas fa-file-excel mr-2"></i> Export to Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="project-list-container">
+                    <div id="project-list-card" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    </div>
+                    <div id="project-list-table" class="hidden">
+                        <table class="min-w-full bg-white rounded-lg shadow-md overflow-hidden">
+                            <thead class="bg-gray-200">
+                                <tr>
+                                    <th
+                                        class="py-3 px-6 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                        ชื่อโครงงาน</th>
+                                    <th
+                                        class="py-3 px-6 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                        นักศึกษา</th>
+                                    <th
+                                        class="py-3 px-6 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                        อาจารย์ที่ปรึกษา</th>
+                                    <th
+                                        class="py-3 px-6 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                        Sec</th>
+                                    <th
+                                        class="py-3 px-6 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                        สถานะ</th>
+                                    <th
+                                        class="py-3 px-6 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                        ดูข้อมูล</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body" class="divide-y divide-gray-200">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <div id="projectModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close-btn" onclick="closeModal('projectModal')">&times;</span>
+            <div class="modal-header">
+                <h2 class="text-3xl font-bold text-gray-800" id="modal-project-name"></h2>
+                <p class="text-gray-600">นักศึกษา: <span id="modal-student-name"></span></p>
+                <p class="text-gray-600">อาจารย์ที่ปรึกษา: <span id="modal-advisor-name"></span></p>
+            </div>
+            <div class="mb-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">ประวัติการตรวจสอบความคืบหน้า</h3>
+                <div id="modal-progress-history" class="space-y-4">
+                </div>
+            </div>
+            <div id="comment-section">
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">ความคิดเห็นเพิ่มเติมจากอาจารย์ประจำรายวิชา</h3>
+                <textarea id="modal-comment" rows="4"
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="กรอกความคิดเห็นเพิ่มเติม..."></textarea>
+                <button onclick="submitComment()"
+                    class="mt-4 w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">
+                    ส่งความคิดเห็น
+                </button>
+            </div>
+        </div>
+    </div>
+    <footer class="bg-gradient-to-r from-blue-800 to-blue-900 text-white py-4 mt-auto shadow-lg">
+        <div
+            class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-center md:text-left space-y-2 md:space-y-0">
+            <div class="flex items-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-300" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+                <p class="font-bold text-sm md:text-base">ระบบยื่นสอบโครงงานพิเศษและโครงงานสหกิจ</p>
+                <span class="hidden md:inline text-blue-200 text-xs md:text-sm">|</span>
+                <p class="text-blue-200 text-xs md:text-sm">ภาควิชาเทคโนโลยีสารสนเทศ มจพ. วิทยาเขตปราจีน</p>
+            </div>
+
+            <div class="text-xs md:text-sm text-center md:text-right">
+                <p class="font-semibold text-blue-100">จัดทำโดย: นายกัณติกรณ์ สรสุริยวงษ์ และ นายพีรพล บัวขยาย</p>
+            </div>
+        </div>
+
+        <hr class="border-blue-700 my-2 opacity-70">
+
+        <p class="text-center text-xs text-blue-300">
+            &copy; 2025 King Mongkut's University of Technology North Bangkok. All Rights Reserved.
+        </p>
+    </footer>
+    <script>
+        const projectData = [{
+            project_id: "PJ001",
+            project_th: "ระบบวิเคราะห์ข้อมูลการขายสำหรับธุรกิจ SME",
+            student_name: "นายศตวรรษ บัวผัน",
+            advisor_name: "ผศ.ดร.นิติการ นาคเจือทอง",
+            sec: 1,
+            status: "pending",
+            progress_history: [
+                { week: 1, date: "2025-09-01", progress_percent: 10, detail: "เริ่มรวบรวมข้อมูลและวางแผนโครงงาน", advisor_comment: "ให้เริ่มศึกษาเครื่องมือวิเคราะห์ข้อมูลที่จำเป็น", attached_doc: "doc1.pdf" },
+                { week: 2, date: "2025-09-08", progress_percent: 40, detail: "เริ่มเขียนบทที่ 1 บทนำ", advisor_comment: "ปรับแก้ขอบเขตโครงงานให้ชัดเจนขึ้น", attached_doc: "doc_week2.pdf" }
+            ]
+        }, {
+            project_id: "PJ002",
+            project_th: "แอปพลิเคชันแนะนำร้านอาหารโดยใช้ AI",
+            student_name: "นางสาวกนกวรรณ ศรีประไชย",
+            advisor_name: "อ.ดร.กาญจน ณ ศรีธะ",
+            sec: 2,
+            status: "reviewed",
+            progress_history: [
+                { week: 1, date: "2025-09-05", progress_percent: 80, detail: "เริ่มออกแบบฐานข้อมูลและ API", advisor_comment: "ฐานข้อมูลออกแบบได้ดี ครอบคลุม", attached_doc: "doc2.docx" },
+                { week: 2, date: "2025-09-12", progress_percent: 100, detail: "เริ่มพัฒนาส่วน Front-end และ Back-end", advisor_comment: "โค้ดสะอาดและเป็นระเบียบดีมาก", attached_doc: "doc3.zip" }
+            ]
+        }, {
+            project_id: "PJ003",
+            project_th: "ระบบบริหารจัดการการเกษตรอัจฉริยะ",
+            student_name: "นายนันทวัฒน์ นันทวิสาร",
+            advisor_name: "อ.ดร.ศิรินทรา แว่วศรี",
+            sec: 1,
+            status: "pending",
+            progress_history: [
+                { week: 1, date: "2025-09-10", progress_percent: 25, detail: "เริ่มทำเอกสารบทที่ 1 และ 2", advisor_comment: "ให้เพิ่มรายละเอียดในส่วนวัตถุประสงค์", attached_doc: null }
+            ]
+        }, {
+            project_id: "PJ004",
+            project_th: "ระบบการจัดการทรัพยากรบุคคลสำหรับองค์กรขนาดเล็ก",
+            student_name: "นายวัชโรทัย เลิศวิลัย",
+            advisor_name: "ผศ.นพดล บูรณ์กุศล",
+            sec: 3,
+            status: "reviewed_by_prof",
+            progress_history: [
+                { week: 1, date: "2025-09-02", progress_percent: 50, detail: "จัดทำแผนการดำเนินงานและกำหนดขอบเขต", advisor_comment: "แผนงานชัดเจน", professor_comment: "งานมีความคืบหน้าดีมาก", attached_doc: "doc4.pdf" }
+            ]
+        }];
+        let currentView = 'card';
+        const projectListCard = document.getElementById('project-list-card');
+        const projectListTable = document.getElementById('project-list-table');
+        const tableBody = document.getElementById('table-body');
+        const toggleViewBtn = document.getElementById('toggle-view-btn');
+        const projectModal = document.getElementById('projectModal');
+        const modalProjectName = document.getElementById('modal-project-name');
+        const modalStudentName = document.getElementById('modal-student-name');
+        const modalAdvisorName = document.getElementById('modal-advisor-name');
+        const modalProgressHistory = document.getElementById('modal-progress-history');
+        const commentSection = document.getElementById('comment-section');
+        const modalComment = document.getElementById('modal-comment');
+        let currentProjectId = null;
+        const getStatusTextAndClass = (status) => {
+            switch (status) {
+                case 'pending':
+                    return { text: 'รอการตรวจสอบ', className: 'pending' };
+                case 'reviewed':
+                    return { text: 'อาจารย์ที่ปรึกษาตรวจสอบเสร็จสิ้น', className: 'reviewed' };
+                case 'reviewed_by_prof':
+                    return { text: 'อาจารย์ประจำรายวิชาตรวจสอบแล้ว', className: 'reviewed_by_prof' };
+                default:
+                    return { text: '', className: '' };
+            }
+        };
+        const renderProjectCards = (projects) => {
+            projectListCard.innerHTML = '';
+            if (projects.length === 0) {
+                projectListCard.innerHTML = `<p class="text-center text-gray-500 text-lg col-span-full">ไม่พบโครงงานที่ตรงกับเงื่อนไข</p>`;
+                return;
+            }
+            projects.forEach(project => {
+                const statusInfo = getStatusTextAndClass(project.status);
+                const latestProgress = project.progress_history.length > 0 ? project.progress_history[project.progress_history.length - 1].progress_percent : 0;
+                const card = document.createElement('div');
+                card.className = `project-card flex flex-col justify-between`;
+                card.innerHTML = `
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">${project.project_th}</h2>
+                        <p class="text-gray-600 mb-1">นักศึกษา: ${project.student_name}</p>
+                        <p class="text-gray-600 mb-4">อาจารย์ที่ปรึกษา: ${project.advisor_name}</p>
+                    </div>
+                    <div class="mb-4">
+                        <p class="text-sm font-semibold text-gray-700">ความคืบหน้าปัจจุบัน</p>
+                        <div class="progress-container">
+                            <div class="progress-fill current ${latestProgress === 100 ? 'completed' : ''}" style="width: ${latestProgress}%;"></div>
+                        </div>
+                        <span class="text-lg font-semibold text-gray-700">${latestProgress}%</span>
+                    </div>
+                    <div class="w-full flex justify-end mb-4">
+                        <span class="status-badge ${statusInfo.className}">${statusInfo.text}</span>
+                    </div>
+                    <button onclick="openProjectModal('${project.project_id}')" class="btn-view-details mt-4">ดูความคืบหน้า</button>
+                `;
+                projectListCard.appendChild(card);
+            });
+        };
+        const renderProjectTable = (projects) => {
+            tableBody.innerHTML = '';
+            if (projects.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="6" class="py-4 text-center text-gray-500">ไม่พบโครงงานที่ตรงกับเงื่อนไข</td></tr>`;
+                return;
+            }
+            projects.forEach(project => {
+                const statusInfo = getStatusTextAndClass(project.status);
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-100 transition-colors duration-200';
+                row.innerHTML = `
+                    <td class="py-4 px-6 text-sm text-gray-900">${project.project_th}</td>
+                    <td class="py-4 px-6 text-sm text-gray-900">${project.student_name}</td>
+                    <td class="py-4 px-6 text-sm text-gray-900">${project.advisor_name}</td>
+                    <td class="py-4 px-6 text-sm text-gray-900">${project.sec}</td>
+                    <td class="py-4 px-6 text-sm text-gray-900"><span class="status-badge ${statusInfo.className}">${statusInfo.text}</span></td>
+                    <td class="py-4 px-6 text-sm text-gray-900">
+                        <button onclick="openProjectModal('${project.project_id}')" class="text-blue-600 hover:text-blue-800 font-medium bg-blue-100 py-1 px-3 rounded-lg"><i class="fas fa-eye"></i> ดูข้อมูล</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        };
+        const filterProjects = () => {
+            const searchTerm = document.getElementById('search-box').value.toLowerCase();
+            const secFilter = document.getElementById('sec-filter').value;
+            const weekFilter = document.getElementById('week-filter').value;
+            const statusFilter = document.getElementById('status-filter').value;
+            const filtered = projectData.filter(project => {
+                const matchesSearch = project.project_th.toLowerCase().includes(searchTerm);
+                const matchesSec = secFilter === 'all' || project.sec.toString() === secFilter;
+                const matchesStatus = statusFilter === 'all' || project.status === statusFilter;
+                let matchesWeek = true;
+                if (weekFilter !== 'all') {
+                    const latestProgressForWeek = project.progress_history.some(item => item.week.toString() === weekFilter);
+                    matchesWeek = latestProgressForWeek;
+                }
+                return matchesSearch && matchesSec && matchesWeek && matchesStatus;
+            });
+            if (currentView === 'card') {
+                renderProjectCards(filtered);
+            } else {
+                renderProjectTable(filtered);
+            }
+        };
+        const toggleView = () => {
+            if (currentView === 'card') {
+                currentView = 'table';
+                projectListCard.classList.add('hidden');
+                projectListTable.classList.remove('hidden');
+                toggleViewBtn.innerHTML = '<i class="fas fa-grip-vertical mr-2"></i> เปลี่ยนรูปแบบการดูเป็นการ์ด';
+            } else {
+                currentView = 'card';
+                projectListTable.classList.add('hidden');
+                projectListCard.classList.remove('hidden');
+                toggleViewBtn.innerHTML = '<i class="fas fa-table mr-2"></i> เปลี่ยนรูปแบบการดูเป็นตาราง';
+            }
+            filterProjects();
+        };
+        const openProjectModal = (projectId) => {
+            const project = projectData.find(p => p.project_id === projectId);
+            if (!project) return;
+            currentProjectId = projectId;
+            modalProjectName.textContent = project.project_th;
+            modalStudentName.textContent = project.student_name;
+            modalAdvisorName.textContent = project.advisor_name;
+            modalComment.value = '';
+            renderModalProgressHistory(project);
+            if (project.status === 'reviewed_by_prof') {
+                commentSection.style.display = 'none';
+            } else {
+                commentSection.style.display = 'block';
+            }
+            projectModal.style.display = 'flex';
+        };
+        const renderModalProgressHistory = (project) => {
+            const weekFilter = document.getElementById('week-filter').value;
+            modalProgressHistory.innerHTML = '';
+            let filteredHistory = project.progress_history;
+            if (weekFilter !== 'all') {
+                const selectedWeek = parseInt(weekFilter);
+                filteredHistory = project.progress_history.filter(item => item.week <= selectedWeek);
+            }
+            if (filteredHistory.length === 0) {
+                modalProgressHistory.innerHTML = `<p class="text-center text-gray-500">ยังไม่มีการส่งความคืบหน้า</p>`;
+                return;
+            }
+            filteredHistory.forEach((item, index) => {
+                const previousProgress = index > 0 ? filteredHistory[index - 1].progress_percent : 0;
+                const currentProgressClass = item.progress_percent === 100 ? 'completed' : 'current';
+                const itemHtml = document.createElement('div');
+                itemHtml.className = 'border-l-2 border-gray-300 pl-4 relative';
+                itemHtml.innerHTML = `
+                    <div class="absolute w-4 h-4 bg-blue-500 rounded-full -left-2 top-0"></div>
+                    <p class="text-sm text-gray-500">${item.date}</p>
+                    <p class="font-semibold text-gray-800">สัปดาห์ที่ ${item.week}: ${item.detail}</p>
+                    <div class="mt-2">
+                        <p class="text-sm font-semibold text-gray-700">สัปดาห์ก่อนหน้า: ${previousProgress}%</p>
+                        <div class="progress-container">
+                            <div class="progress-fill previous" style="width: ${previousProgress}%;"></div>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <p class="text-sm font-semibold text-gray-700">สัปดาห์ปัจจุบัน: ${item.progress_percent}%</p>
+                        <div class="progress-container">
+                            <div class="progress-fill ${currentProgressClass}" style="width: ${item.progress_percent}%;"></div>
+                        </div>
+                    </div>
+                    ${item.advisor_comment ? `<p class="text-sm text-gray-700 mt-2"><strong>ความคิดเห็นจากอาจารย์ที่ปรึกษา:</strong> ${item.advisor_comment}</p>` : ''}
+                    ${item.professor_comment ? `<p class="text-sm text-gray-700 mt-2"><strong>ความคิดเห็นจากอาจารย์ประจำรายวิชา:</strong> ${item.professor_comment}</p>` : ''}
+                    ${item.attached_doc ? `<a href="#" class="text-blue-500 hover:underline mt-2 inline-block"><i class="fas fa-paperclip mr-2"></i>ดูเอกสารแนบ: ${item.attached_doc}</a>` : ''}
+                `;
+                modalProgressHistory.appendChild(itemHtml);
+            });
+        };
+        const closeModal = (modalId) => {
+            document.getElementById(modalId).style.display = 'none';
+        };
+        const submitComment = () => {
+            const comment = modalComment.value;
+            if (comment.trim() === '') {
+                alert('กรุณากรอกความคิดเห็นก่อนส่ง');
+                return;
+            }
+            alert(`ความคิดเห็นของคุณ: "${comment}" ได้ถูกส่งเรียบร้อยแล้ว`);
+            modalComment.value = '';
+            closeModal('projectModal');
+            const project = projectData.find(p => p.project_id === currentProjectId);
+            if (project) {
+                project.status = 'reviewed_by_prof';
+                const lastHistory = project.progress_history[project.progress_history.length - 1];
+                if (lastHistory) {
+                    lastHistory.professor_comment = comment;
+                }
+            }
+            filterProjects();
+        };
+        const exportToExcel = () => {
+            const dataToExport = projectData.flatMap(project =>
+                project.progress_history.length > 0
+                    ? project.progress_history.map(history => ({
+                        ...project,
+                        ...history,
+                        status_text: getStatusTextAndClass(project.status).text,
+                        advisor_comment: history.advisor_comment || '',
+                        professor_comment: history.professor_comment || ''
+                    }))
+                    : [
+                        {
+                            ...project,
+                            status_text: getStatusTextAndClass(project.status).text,
+                            week: '-',
+                            progress_percent: '-',
+                            detail: '-',
+                            advisor_comment: '-',
+                            professor_comment: '-'
+                        }
+                    ]
+            );
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+            const headers = ["ชื่อโครงงาน", "นักศึกษา", "อาจารย์ที่ปรึกษา", "Sec", "สถานะ", "สัปดาห์", "ความคืบหน้า (%)", "รายละเอียด", "ความคิดเห็นอาจารย์ที่ปรึกษา", "ความคิดเห็นอาจารย์ประจำรายวิชา"];
+            csvContent += headers.join(",") + "\n";
+            dataToExport.forEach(row => {
+                const rowData = [
+                    row.project_th,
+                    row.student_name,
+                    row.advisor_name,
+                    row.sec,
+                    row.status_text,
+                    row.week,
+                    row.progress_percent,
+                    row.detail,
+                    row.advisor_comment,
+                    row.professor_comment
+                ].map(item => `"${(item || '').toString().replace(/"/g, '""')}"`).join(",");
+                csvContent += rowData + "\n";
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "รายงานความคืบหน้าโครงงาน.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+        window.onclick = (event) => {
+            if (event.target === projectModal) {
+                closeModal('projectModal');
+            }
+        };
+        document.addEventListener('DOMContentLoaded', () => {
+            filterProjects();
+            if (currentView === 'card') {
+                toggleViewBtn.innerHTML = '<i class="fas fa-table mr-2"></i> เปลี่ยนรูปแบบการดูเป็นตาราง';
+            } else {
+                toggleViewBtn.innerHTML = '<i class="fas fa-grip-vertical mr-2"></i> เปลี่ยนรูปแบบการดูเป็นการ์ด';
+            }
+            document.getElementById('week-filter').addEventListener('change', () => {
+                if (projectModal.style.display === 'flex') {
+                    const project = projectData.find(p => p.project_id === currentProjectId);
+                    if (project) {
+                        renderModalProgressHistory(project);
+                    }
+                }
+            });
+        });
+        // Function to show the logout alert
+        function showLogoutAlert() {
+            document.getElementById('logoutAlert').classList.remove('hidden');
+        }
+
+        // Function to hide the logout alert
+        function confirmLogout() {
+            document.getElementById('logoutAlert').classList.add('hidden');
+            window.location.href = "../login.html";
+        }
+        // Function to handle the logout action
+        document.addEventListener('DOMContentLoaded', function() {
+    // Get the sidebar and the open/close buttons
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOpenBtn = document.getElementById('sidebar-open-btn'); // Add a button to open the sidebar
+    const sidebarCloseBtn = document.getElementById('sidebar-close-btn');
+
+    // Function to open the sidebar
+    function openSidebar() {
+        sidebar.classList.remove('-left-full'); // Or whichever class you use to hide it
+        sidebar.classList.add('left-0');
+    }
+
+    // Function to close the sidebar
+    function closeSidebar() {
+        sidebar.classList.remove('left-0');
+        sidebar.classList.add('-left-full'); // Or whichever class you use to hide it
+    }
+
+    // Add a click event to the close button
+    if (sidebarCloseBtn) {
+        sidebarCloseBtn.addEventListener('click', closeSidebar);
+    }
+    
+    // Add a click event to an open button (you'll need to add this to your HTML)
+    if (sidebarOpenBtn) {
+        sidebarOpenBtn.addEventListener('click', openSidebar);
+    }
+
+    // แก้ไข: ปรับโค้ดการปิด sidebar เมื่อคลิกนอกพื้นที่
+    // เพิ่มเงื่อนไขว่าโค้ดนี้จะทำงานเฉพาะบนหน้าจอขนาดเล็กกว่า 1024px เท่านั้น
+    window.addEventListener('click', function(event) {
+        if (window.innerWidth < 1024) { // ตรวจสอบขนาดหน้าจอ
+            if (!sidebar.contains(event.target) && !event.target.closest('#sidebar-open-btn')) {
+                closeSidebar();
+            }
+        }
+    });
+
+    // Add responsive behavior based on screen size
+    function handleResize() {
+        if (window.innerWidth >= 1024) { // Tailwind's 'lg' breakpoint
+            sidebar.classList.remove('fixed', '-left-full');
+            sidebar.classList.add('relative', 'left-0');
+        } else {
+            sidebar.classList.remove('relative', 'left-0');
+            sidebar.classList.add('fixed', '-left-full');
+        }
+    }
+
+    // Run on page load and on window resize
+    handleResize();
+    window.addEventListener('resize', handleResize);
+});
+    </script>
+</body>
+
+</html>

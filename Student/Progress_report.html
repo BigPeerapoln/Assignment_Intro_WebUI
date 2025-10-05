@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ประวัติความคืบหน้าโครงงาน</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            box-sizing: border-box;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content-card {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .progress-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            cursor: pointer;
+        }
+
+        .progress-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 20px -5px rgba(0, 0, 0, 0.1), 0 6px 8px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-container {
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen">
+
+    <header class="bg-blue-800 shadow-md p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <button id="sidebar-open-btn" class="lg:hidden p-2 text-white focus:outline-none">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7">
+                    </path>
+                </svg>
+            </button>
+            <h1 class="text-xl md:text-2xl font-bold text-white">
+                ระบบยื่นสอบโครงงานพิเศษ และโครงงานสหกิจ
+            </h1>
+            <div class="flex items-center space-x-4">
+
+                <!-- ชื่อนักเรียน -->
+                <span class="text-white font-semibold">กัณติกรณ์</span>
+                <div class="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                    <img src="../img_system/student.jpg" alt="Student Profile" class="object-cover w-full h-full">
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 flex-grow">
+
+        <aside id="sidebar"
+            class="sidebar lg:relative fixed top-0 left-0 h-full overflow-y-auto z-30 lg:block lg:p-4 bg-white shadow-md flex-grow min-h-screen col-span-2 w-[280px]">
+            <div
+                class="p-4 bg-indigo-700 text-white flex items-center justify-between lg:justify-start lg:rounded-t-lg lg:hidden">
+                <h3 class="text-xl font-bold">เมนู</h3>
+                <button id="sidebar-close-btn" class="lg:hidden text-white text-2xl">&times;</button>
+            </div>
+            <nav class="p-1 bg-white lg:rounded-b-lg">
+                <ul class="space-y-2">
+                    <a href="Main_student_final.html"
+                        class="flex items-center p-3 text-white bg-indigo-600 rounded-md transition-colors w-64">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-white" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1" />
+                        </svg>
+                        กลับหน้าหลัก
+                    </a>
+                    <li>
+                        <a href="Check_status_success.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 7.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zM7.5 10a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5zM7.5 12.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" />
+                            </svg>
+                            ตรวจสอบผลการสอบหัวข้อ
+                        </a>
+                    </li>
+                    <li>
+                        <a href="Progress_report.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 7.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zM7.5 10a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5zM7.5 12.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" />
+                            </svg>
+                            ข้อมูลความคืบหน้าโครงงาน
+                        </a>
+                    </li>
+                    <li>
+                        <a href="final_check_state.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M9 2a1 1 0 00-1 1v2a1 1 0 002 0V3a1 1 0 00-1-1zM5.553 4.847a1 1 0 00-1.414 1.414l1.414 1.414a1 1 0 101.414-1.414L5.553 4.847zM3 9a1 1 0 000 2h2a1 1 0 100-2H3zM4.847 14.447a1 1 0 00-1.414-1.414l-1.414 1.414a1 1 0 101.414 1.414l1.414-1.414zM9 17a1 1 0 00-1 1v2a1 1 0 102 0v-2a1 1 0 00-1-1zM14.447 19.153a1 1 0 001.414-1.414l-1.414-1.414a1 1 0 00-1.414 1.414l1.414 1.414zM17 10a1 1 0 000-2h2a1 1 0 100 2h-2zM19.153 14.447a1 1 0 00-1.414 1.414l1.414 1.414a1 1 0 001.414-1.414l-1.414-1.414z" />
+                            </svg>
+                            ติดตามสถานะสอบโครงงานจบ
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="Check_final_project_success.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M2 4a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V4zm2-2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4z"
+                                    clip-rule="evenodd" fill-rule="evenodd" />
+                                <path fill-rule="evenodd"
+                                    d="M7 6a1 1 0 00-1 1v8a1 1 0 102 0V7a1 1 0 00-1-1zM10 6a1 1 0 00-1 1v6a1 1 0 102 0V7a1 1 0 00-1-1zM13 6a1 1 0 00-1 1v4a1 1 0 102 0V7a1 1 0 00-1-1z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            ตรวจสอบผลสอบโครงงานจบ
+                        </a>
+                    </li>
+
+
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="flex-grow p-8 col-span-10">
+            <div class="text-center mb-6">
+                <div class="flex border-b border-gray-300 mb-6">
+
+                    <a href="Main_student_final.html" class="tab-button py-3 px-6 text-center text-gray-500 font-medium">
+                        หน้าเเดชบอร์ดสำหรับนักศึกษา
+                    </a>
+                    <a href="Progress_report.html" class="tab-button py-3 px-6 text-center text-gray-500 font-medium">
+                        หน้าเเสดงความคืบหน้าย้อนหลังโครงงาน
+                    </a>
+
+
+
+                </div>
+                <h1 class="text-4xl font-bold text-gray-800">ข้อมูลความคืบหน้าย้อนหลัง</h1>
+                <p class="text-lg text-gray-600 mt-2">ประวัติการส่งความคืบหน้าโครงงาน</p>
+                <div class="flex justify-end mb-4">
+                    <button onclick="openModal('progressModal')"
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded-lg shadow-md transition duration-200">
+                        + เพิ่มความคืบหน้า
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="flex flex-col gap-6 w-full md:w-2/5">
+                    <div class="bg-white rounded-lg shadow-lg p-4 h-96 flex flex-col items-center mt-6">
+                        <h2 class="text-xl font-bold text-gray-800 mb-2">รายละเอียดโครงงาน</h2>
+                        <div class="chart-container w-full flex-grow">
+                            <canvas id="weeklyProgressChart"></canvas>
+                        </div>
+                        <button id="openProjectDetailBtn"
+                            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-3 rounded-md shadow-md w-full text-sm mt-3">
+                            ดูรายละเอียดโครงงาน
+                        </button>
+                    </div>
+
+
+                    <div
+                        class="bg-blue-800 text-white rounded-lg shadow-lg p-4 flex flex-col justify-center items-center">
+                        <h2 class="text-2xl font-bold text-center mb-2">สถานะการติดตาม</h2>
+                        <p class="text-md text-center mb-3">ความคืบหน้าของโครงงาน</p>
+                        <div class="w-full bg-blue-600 rounded-full h-8 relative overflow-hidden my-4">
+                            <div id="progressBar"
+                                class="bg-green-400 h-8 rounded-full flex items-center justify-center text-white text-xl font-bold transition-all duration-700 ease-out"
+                                style="width:0%;">
+                                <span id="progressText">0%</span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-center mt-3" id="currentProgressDate">ความคืบหน้าปัจจุบัน ณ วันที่ 13
+                            กันยายน
+                            2568</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-6 w-full md:w-3/5">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-2xl font-bold text-gray-800">ประวัติความคืบหน้า</h2>
+                        <select id="weekFilter"
+                            class="px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="all" selected>ทั้งหมด</option>
+                            <option value="สัปดาห์ที่ 4">สัปดาห์ที่ 4 (ปัจจุบัน)</option>
+                            <option value="สัปดาห์ที่ 3">สัปดาห์ที่ 3</option>
+                            <option value="สัปดาห์ที่ 2">สัปดาห์ที่ 2</option>
+                            <option value="สัปดาห์ที่ 1">สัปดาห์ที่ 1</option>
+                        </select>
+                    </div>
+                    <div class="space-y-6" id="progressCards">
+                        <div data-week="สัปดาห์ที่ 4"
+                            class="progress-card bg-white rounded-lg shadow-lg p-6 flex justify-between items-center">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-2">ความคืบหน้าสัปดาห์ที่ 4</h3>
+                                <p class="text-lg text-gray-600">วันที่เพิ่ม: 13 กันยายน 2568</p>
+                                <div class="mt-2 flex items-center">
+                                    <span class="text-sm font-semibold mr-2">สถานะ:</span>
+                                    <span class="text-red-500 font-bold">รออาจารย์ตรวจสอบ</span>
+                                    <svg class="w-5 h-5 ml-2 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <button onclick="showProgressDetailsModal(weeklyData[3])"
+                                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md shadow-md">
+                                ดูรายละเอียด
+                            </button>
+
+                        </div>
+
+                        <div data-week="สัปดาห์ที่ 3"
+                            class="progress-card bg-white rounded-lg shadow-lg p-6 flex justify-between items-center">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-2">ความคืบหน้าสัปดาห์ที่ 3</h3>
+                                <p class="text-lg text-gray-600">วันที่เพิ่ม: 6 กันยายน 2568</p>
+                                <div class="mt-2 flex items-center">
+                                    <span class="text-sm font-semibold mr-2">สถานะ:</span>
+                                    <span class="text-green-500 font-bold">อาจารย์ตรวจสอบเสร็จสิ้น</span>
+                                    <svg class="w-5 h-5 ml-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <button onclick="showProgressDetailsModal(weeklyData[2])"
+                                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md shadow-md">
+                                ดูรายละเอียด
+                            </button>
+
+
+                        </div>
+
+                        <div data-week="สัปดาห์ที่ 2"
+                            class="progress-card bg-white rounded-lg shadow-lg p-6 flex justify-between items-center">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-2">ความคืบหน้าสัปดาห์ที่ 2</h3>
+                                <p class="text-lg text-gray-600">วันที่เพิ่ม: 30 สิงหาคม 2568</p>
+                                <div class="mt-2 flex items-center">
+                                    <span class="text-sm font-semibold mr-2">สถานะ:</span>
+                                    <span class="text-green-500 font-bold">อาจารย์ตรวจสอบเสร็จสิ้น</span>
+                                    <svg class="w-5 h-5 ml-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <button <button onclick="showProgressDetailsModal(weeklyData[1])"
+                                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md shadow-md">
+                                ดูรายละเอียด
+                            </button>
+                        </div>
+
+                        <div data-week="สัปดาห์ที่ 1"
+                            class="progress-card bg-white rounded-lg shadow-lg p-6 flex justify-between items-center">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-2">ความคืบหน้าสัปดาห์ที่ 1</h3>
+                                <p class="text-lg text-gray-600">วันที่เพิ่ม: 23 สิงหาคม 2568</p>
+                                <div class="mt-2 flex items-center">
+                                    <span class="text-sm font-semibold mr-2">สถานะ:</span>
+                                    <span class="text-green-500 font-bold">อาจารย์ตรวจสอบเสร็จสิ้น</span>
+                                    <svg class="w-5 h-5 ml-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <button <button onclick="showProgressDetailsModal(weeklyData[0])"
+                                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md shadow-md">
+                                ดูรายละเอียด
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="progressDetailsModal" class="modal">
+        <div class="modal-content-card max-w-2xl">
+            <div
+                class="bg-gradient-to-r from-blue-700 to-blue-900 text-white px-6 py-5 flex justify-between items-center shadow-md">
+                <h2 id="modalTitle" class="text-2xl font-bold drop-shadow-lg"></h2>
+                <button onclick="closeModal('progressDetailsModal')"
+                    class="text-white hover:text-gray-200 text-3xl font-bold focus:outline-none">
+                    &times;
+                </button>
+            </div>
+            <div class="p-8 space-y-4">
+                <p class="text-xl"><strong>สถานะ:</strong> <span id="modalStatus" class="font-bold"></span></p>
+                <p class="text-xl"><strong>รายละเอียด:</strong> <span id="modalDetail"></span></p>
+                <p class="text-xl">
+                    <strong>ไฟล์/ลิงก์:</strong>
+                    <a id="modalLink" href="#" target="_blank" class="text-blue-500 hover:underline">คลิกเพื่อดู</a>
+                </p>
+
+                <div id="progressSection" class="hidden">
+                    <hr class="my-4">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">สถานะการตรวจสอบและความคิดเห็น</h3>
+
+                    <div class="mb-4">
+                        <p class="text-lg text-gray-700 font-semibold mb-2">ความคิดเห็นของอาจารย์ที่ปรึกษาโครงงาน:</p>
+                        <div id="modalAdvisorComment" class="bg-gray-100 p-4 rounded-md text-gray-800"></div>
+                    </div>
+                    <div class="mb-4">
+                        <p class="text-lg text-gray-700 font-semibold mb-2">ความคิดเห็นของอาจารย์ประจำรายวิชา:</p>
+                        <div id="modalSubjectComment" class="bg-gray-100 p-4 rounded-md text-gray-800"></div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm text-gray-600">ความคืบหน้าเดิม (โดยนักศึกษา)</span>
+                            <span id="oldProgressText" class="text-sm font-semibold text-gray-800"></span>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-2">วันที่ส่ง: <span id="oldProgressDate"></span></p>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div id="oldProgressBar" class="bg-blue-400 h-2.5 rounded-full" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm text-gray-600">ความคืบหน้าใหม่ (โดยอาจารย์)</span>
+                            <span id="newProgressText" class="text-sm font-semibold text-gray-800"></span>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-2">วันที่ตรวจสอบ: <span id="newProgressDate"></span></p>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div id="newProgressBar" class="bg-green-500 h-2.5 rounded-full" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 text-center">
+                        <p class="text-lg font-bold text-gray-800">ความคืบหน้าปัจจุบันที่ได้:</p>
+                        <h4 id="currentProgress" class="text-4xl font-extrabold text-blue-600 mt-1"></h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="progressModal" class="modal">
+        <div class="modal-content-card">
+            <div
+                class="bg-gradient-to-r from-blue-700 to-blue-900 text-white px-6 py-5 flex justify-between items-center shadow-md">
+                <h2 class="text-2xl font-bold drop-shadow-lg">เพิ่มความคืบหน้ารายสัปดาห์</h2>
+                <button onclick="closeModal('progressModal')"
+                    class="text-white hover:text-gray-200 text-3xl font-bold focus:outline-none">
+                    &times;
+                </button>
+            </div>
+            <form class="p-8 space-y-6">
+                <div>
+                    <label for="progressDetail"
+                        class="block text-gray-700 font-semibold mb-1">รายละเอียดความคืบหน้า:</label>
+                    <textarea id="progressDetail"
+                        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        rows="5" placeholder="สรุปรายละเอียดความคืบหน้าของโครงงานในสัปดาห์นี้"></textarea>
+                </div>
+                <div>
+                    <label for="documentFile" class="block text-gray-700 font-semibold mb-1">แนบไฟล์เอกสาร:</label>
+                    <input type="file" id="documentFile"
+                        class="w-full text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+                </div>
+                <div>
+                    <label for="documentLink" class="block text-gray-700 font-semibold mb-1">
+                        แนบไฟล์ลิงก์ (Google Drive/GitHub):
+                    </label>
+                    <input type="url" id="documentLink"
+                        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="ตัวอย่าง: https://drive.google.com/folder">
+                </div>
+                <div class="flex space-x-4 mt-6">
+                    <button type="button" onclick="submitProgress()"
+                        class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-md transition-colors duration-200">
+                        ยืนยัน
+                    </button>
+                    <button type="button" onclick="closeModal('progressModal')"
+                        class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 rounded-md transition-colors duration-200">
+                        ยกเลิก
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="bg-gradient-to-r from-blue-800 to-blue-900 text-white py-4 mt-auto shadow-lg">
+        <div
+            class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-center md:text-left space-y-2 md:space-y-0">
+            <div class="flex items-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-300" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+                <p class="font-bold text-sm md:text-base">ระบบยื่นสอบโครงงานพิเศษและโครงงานสหกิจ</p>
+                <span class="hidden md:inline text-blue-200 text-xs md:text-sm">|</span>
+                <p class="text-blue-200 text-xs md:text-sm">ภาควิชาเทคโนโลยีสารสนเทศ มจพ. วิทยาเขตปราจีน</p>
+            </div>
+
+            <div class="text-xs md:text-sm text-center md:text-right">
+                <p class="font-semibold text-blue-100">จัดทำโดย: นายกัณติกรณ์ สรสุริยวงษ์ และ นายพีรพล บัวขยาย</p>
+            </div>
+        </div>
+
+        <hr class="border-blue-700 my-2 opacity-70">
+
+        <p class="text-center text-xs text-blue-300">
+            &copy; 2025 King Mongkut's University of Technology North Bangkok. All Rights Reserved.
+        </p>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="progress_report.js">
+
+
+
+    </script>
+</body>
+
+</html>

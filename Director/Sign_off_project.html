@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ลงนามเอกสารโครงงานจบ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f5f7fa;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header-bg {
+            background-color: #1e3a8a;
+        }
+
+        .sidebar {
+            background-color: #ffffff;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(0);
+            z-index: 20;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 2rem;
+        }
+
+        .tab-button.active {
+            background-color: #e0e7ff;
+            color: #4338ca;
+            border-left: 4px solid #4338ca;
+        }
+
+        .modal-bg {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-card {
+            background-color: #f5f7fa;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            width: 95%;
+            max-width: 800px;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background-color: #1e3a8a;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .info-card {
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+        }
+
+        .alert-modal-card {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .file-box {
+            border: 1px solid #e5e7eb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .summary-card {
+            background-color: #ffffff;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen">
+
+    <header class="header-bg text-white shadow-lg py-6 px-8">
+        <div class="container mx-auto flex justify-between items-center">
+            <button id="sidebar-open-btn" class="lg:hidden p-2 text-white focus:outline-none">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7">
+                    </path>
+                </svg>
+            </button>
+            <h1 class="text-3xl font-bold">ระบบจัดการโครงงานพิเศษและโครงงานสหกิจ</h1>
+            <div class="flex items-center space-x-4">
+                <span class="text-lg font-medium">สวัสดี: ผศ.ดร.นิติการ นาคเจือทอง</span>
+                <a href="#" class="text-white hover:text-gray-300 transition duration-300">
+                    <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1">
+        <aside id="sidebar" class="sidebar w-2/12 p-4 min-h-screen w-[280px]">
+            <nav class="space-y-2">
+                <ul class="space-y-2">
+                    <a href="dashbroad_director.html"
+                        class="flex items-center p-3 text-white bg-indigo-600 rounded-md transition-colors w-64">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-white" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1" />
+                        </svg>
+                        กลับหน้าหลัก
+                    </a>
+                    <li>
+                        <a href="exam_topics_table.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
+                            <i class="fas fa-calendar-alt mr-3 text-indigo-500"></i>
+                            ตารางการสอบหัวข้อโครงงาน
+                        </a>
+                    </li>
+                    <li>
+                        <a href="Evaluation_toppic.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
+                            <i class="fas fa-edit mr-3 text-indigo-500"></i>
+                            ประเมินผลสอบหัวข้อโครงงาน
+                        </a>
+                    </li>
+                    <li>
+                        <a href="status_topic.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
+                            <i class="fas fa-chart-line mr-3 text-indigo-500"></i>
+                            ติดตามสถานะโครงงาน
+                        </a>
+                    </li>
+                    <li>
+                        <a href="schedule_final.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
+                            <i class="fas fa-calendar-check mr-3 text-indigo-500"></i>
+                            ตารางการสอบจบโครงงาน
+                        </a>
+                    </li>
+                    <li>
+                        <a href="Evaluation_final_Test.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
+                            <i class="fas fa-poll mr-3 text-indigo-500"></i>
+                            ประเมินผลขึ้นสอบโครงงานจบ
+                        </a>
+                    </li>
+                    <li class="bg-indigo-600 rounded-md">
+                        <div class="flex items-center p-3 text-white">
+                            <i class="fas fa-signature mr-3"></i>
+                            ลงนามเอกสารโครงงานจบ
+                        </div>
+                        <ul class="mt-2 pl-4 space-y-1">
+                            <li>
+                                <a href="#" id="pending-tab"
+                                    class="tab-button block py-2 px-4 text-gray-100 hover:bg-indigo-700 rounded-md transition-colors active">
+                                    <i class="fas fa-clock mr-2"></i> รอลงนาม
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" id="completed-tab"
+                                    class="tab-button block py-2 px-4 text-gray-100 hover:bg-indigo-700 rounded-md transition-colors">
+                                    <i class="fas fa-check-circle mr-2"></i> ลงนามเสร็จสิ้น
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content w-10/12">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">ลงนามเอกสารโครงงานจบ</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="summary-card flex items-center space-x-4">
+                    <div
+                        class="flex-shrink-0 w-12 h-12 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="text-gray-600 font-semibold text-sm">โครงงานที่รอลงนาม</div>
+                        <div id="pendingCount" class="text-2xl font-bold text-gray-800">0</div>
+                    </div>
+                </div>
+                <div class="summary-card flex items-center space-x-4">
+                    <div
+                        class="flex-shrink-0 w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="text-gray-600 font-semibold text-sm">โครงงานที่ลงนามแล้ว</div>
+                        <div id="completedCount" class="text-2xl font-bold text-gray-800">0</div>
+                    </div>
+                </div>
+                <div class="summary-card flex items-center space-x-4">
+                    <div
+                        class="flex-shrink-0 w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 11H5m14 0a2 2 0 012 2v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0a2 2 0 002-2h2a2 2 0 002 2m7 0V7a2 2 0 00-2-2M7 7h10" />
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="text-gray-600 font-semibold text-sm">โครงงานทั้งหมด</div>
+                        <div id="totalCount" class="text-2xl font-bold text-gray-800">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-md overflow-x-auto">
+                <table class="min-w-full table-auto" id="projectTable">
+                    <thead>
+                        <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                            <th class="py-3 px-6 text-left">ลำดับ</th>
+                            <th class="py-3 px-6 text-left">ชื่อโครงงาน</th>
+                            <th class="py-3 px-6 text-left">วันที่แนบเอกสาร</th>
+                            <th class="py-3 px-6 text-left">สถานะ</th>
+                            <th class="py-3 px-6 text-center">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-600 text-sm font-light" id="projectList">
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <div id="documentModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-bg">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 class="text-xl md:text-2xl font-bold">ตรวจสอบเอกสารและลงนาม</h3>
+            </div>
+            <div class="p-6 space-y-6">
+                <div class="info-card">
+                    <h4 class="text-lg font-bold text-gray-800 mb-4">รายละเอียดโครงงาน</h4>
+                    <div id="modalProjectInfo" class="space-y-2">
+                    </div>
+                </div>
+                <div class="info-card">
+                    <h4 class="text-lg font-bold text-gray-800 mb-4">ไฟล์เล่มสมบูรณ์</h4>
+                    <div class="space-y-4" id="fileSection">
+                    </div>
+                </div>
+                <div class="info-card">
+                    <h4 class="text-lg font-bold text-gray-800 mb-4">สถานะการลงนามของกรรมการ</h4>
+                    <div id="evaluatorStatus" class="space-y-2">
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 pt-0 flex justify-end space-x-4">
+                <button id="signButton"
+                    class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">ลงนามเสร็จสิ้น</button>
+                <button onclick="closeModal('documentModal')"
+                    class="bg-gray-300 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-400 transition">ปิด</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="historyModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-bg">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 class="text-xl md:text-2xl font-bold">ข้อมูลการลงนามย้อนหลัง</h3>
+            </div>
+            <div class="p-6 space-y-6">
+                <div class="info-card">
+                    <h4 class="text-lg font-bold text-gray-800 mb-4">รายละเอียดโครงงาน</h4>
+                    <div id="historyModalProjectInfo" class="space-y-2"></div>
+                </div>
+                <div class="info-card">
+                    <h4 class="text-lg font-bold text-gray-800 mb-4">ไฟล์เล่มสมบูรณ์</h4>
+                    <div class="space-y-4" id="historyFileSection"></div>
+                </div>
+                <div class="info-card">
+                    <h4 class="text-lg font-bold text-gray-800 mb-4">สถานะการลงนาม</h4>
+                    <div id="historyEvaluationStatus" class="space-y-2"></div>
+                </div>
+            </div>
+            <div class="p-6 pt-0 flex justify-end space-x-4">
+                <button onclick="closeModal('historyModal')"
+                    class="bg-gray-300 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-400 transition">ปิด</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="finalExamAlert" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40 hidden">
+        <div class="alert-modal-card">
+            <svg id="finalSuccessIcon" class="mx-auto text-green-500 w-16 h-16 mb-4" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h3 id="finalAlertTitle" class="text-2xl font-bold text-gray-800 mb-2">ลงนามเอกสารเสร็จสิ้น</h3>
+            <p id="finalAlertMessage" class="text-gray-600">การลงนามในเอกสารโครงงานสำเร็จเรียบร้อยแล้ว</p>
+            <a href="#" onclick="hideAlert()"
+                class="mt-6 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-md transition-colors duration-200 text-center inline-block">ตกลง</a>
+        </div>
+    </div>
+
+    <footer class="bg-gradient-to-r from-blue-800 to-blue-900 text-white py-4 mt-auto shadow-lg">
+        <div
+            class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-center md:text-left space-y-2 md:space-y-0">
+            <div class="flex items-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-300" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+                <p class="font-bold text-sm md:text-base">ระบบยื่นสอบโครงงานพิเศษและโครงงานสหกิจ</p>
+                <span class="hidden md:inline text-blue-200 text-xs md:text-sm">|</span>
+                <p class="text-blue-200 text-xs md:text-sm">ภาควิชาเทคโนโลยีสารสนเทศ มจพ. วิทยาเขตปราจีน</p>
+            </div>
+            <div class="text-xs md:text-sm text-center md:text-right">
+                <p class="font-semibold text-blue-100">จัดทำโดย: นายกัณติกรณ์ สรสุริยวงษ์ และ นายพีรพล บัวขยาย</p>
+            </div>
+        </div>
+        <hr class="border-blue-700 my-2 opacity-70">
+        <p class="text-center text-xs text-blue-300">
+            &copy; 2025 King Mongkut's University of Technology North Bangkok. All Rights Reserved.
+        </p>
+    </footer>
+
+    <script>
+        const projects = [
+            {
+                id: 1,
+                name: 'ระบบติดตามโครงงานนักศึกษา',
+                uploadDate: '21 ก.ย. 2568',
+                status: 'pending',
+                students: ['นายภูวดล เวชชนะ (6806022510131)', 'นางสาวธิติญา โพธิ์ศรี (6806022510084)'],
+                adviser: 'ผศ.นพดล บูรณ์กุศล',
+                co_adviser: 'ไม่มี',
+                files: [
+                    { name: 'เล่มโครงงาน.pdf', url: '#' },
+                    { name: 'เล่มโครงงาน.docx', url: '#' }
+                ],
+                president: { name: 'รศ.ดร.อนิราช มิ่งขวัญ', signed: false },
+                evaluators: [
+                    { name: 'ผศ.ดร.บีสุดา ดาวเรือง', signed: false },
+                    { name: 'ผศ.ดร.ขนิษฐา นามี', signed: false },
+                    { name: 'ผศ.ดร.นิติการ นาคเจือทอง', signed: false }
+                ]
+            },
+            {
+                id: 2,
+                name: 'แอปพลิเคชันบริหารจัดการหอพัก',
+                uploadDate: '20 ก.ย. 2568',
+                status: 'completed',
+                signedDate: '15 ก.ย. 2568',
+                students: ['นายภูมิรพี เมืองไทย (6806022510157)'],
+                adviser: 'ผศ.ดร.ขนิษฐา นามี',
+                co_adviser: 'ไม่มี',
+                files: [
+                    { name: 'รายงานฉบับสมบูรณ์.pdf', url: '#' },
+                    { name: 'รายงานฉบับสมบูรณ์.docx', url: '#' }
+                ],
+                president: { name: 'รศ.ดร.อนิราช มิ่งขวัญ', signed: true },
+                evaluators: [
+                    { name: 'ผศ.ดร.บีสุดา ดาวเรือง', signed: true },
+                    { name: 'ผศ.ดร.ขนิษฐา นามี', signed: true },
+                    { name: 'ผศ.นพดล บูรณ์กุศล', signed: true }
+                ]
+            },
+            {
+                id: 3,
+                name: 'ระบบแจ้งซ่อมบำรุงในโรงเรียน',
+                uploadDate: '19 ก.ย. 2568',
+                status: 'pending',
+                students: ['นายพิธินัย ชัยนเรศ (6806022510165)'],
+                adviser: 'ผศ.ดร.นิติการ นาคเจือทอง',
+                co_adviser: 'ไม่มี',
+                files: [
+                    { name: 'เอกสารโครงงาน.docx', url: '#' },
+                    { name: 'เอกสารโครงงาน.pdf', url: '#' }
+                ],
+                president: { name: 'รศ.ดร.อนิราช มิ่งขวัญ', signed: false },
+                evaluators: [
+                    { name: 'ผศ.ดร.บีสุดา ดาวเรือง', signed: false },
+                    { name: 'ผศ.ดร.ขนิษฐา นามี', signed: false },
+                    { name: 'ผศ.นพดล บูรณ์กุศล', signed: false }
+                ]
+            },
+            {
+                id: 4,
+                name: 'เว็บไซต์ร้านค้าออนไลน์สำหรับ SME',
+                uploadDate: '18 ก.ย. 2568',
+                status: 'completed',
+                signedDate: '10 ก.ย. 2568',
+                students: ['นายบุญญฤทธิ์ วุฒิ (6806022510173)', 'นางสาวพัทธนันต์ ขันธลักษณา (6806022510181)'],
+                adviser: 'ผศ.ดร.นิติการ นาคเจือทอง',
+                co_adviser: 'ไม่มี',
+                files: [
+                    { name: 'Final_Project_Report.pdf', url: '#' },
+                    { name: 'Final_Project_Report.docx', url: '#' }
+                ],
+                president: { name: 'รศ.ดร.อนิราช มิ่งขวัญ', signed: true },
+                evaluators: [
+                    { name: 'ผศ.ดร.บีสุดา ดาวเรือง', signed: true },
+                    { name: 'ผศ.ดร.ขนิษฐา นามี', signed: true },
+                    { name: 'ผศ.นพดล บูรณ์กุศล', signed: true }
+                ]
+            }
+        ];
+
+        let currentTab = 'pending';
+
+        function renderTable() {
+            const tableBody = document.getElementById('projectList');
+            tableBody.innerHTML = '';
+            const filteredProjects = projects.filter(p => p.status === currentTab);
+
+            if (filteredProjects.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="5" class="py-4 text-center text-gray-500">ไม่มีข้อมูลโครงงานในสถานะนี้</td>`;
+                tableBody.appendChild(row);
+                return;
+            }
+
+            filteredProjects.forEach((project, index) => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-gray-200 hover:bg-gray-100';
+                row.innerHTML = `
+                    <td class="py-3 px-6 text-left whitespace-nowrap">${index + 1}</td>
+                    <td class="py-3 px-6 text-left font-medium">${project.name}</td>
+                    <td class="py-3 px-6 text-left">${project.uploadDate}</td>
+                    <td class="py-3 px-6 text-left">
+                        <span class="bg-${project.status === 'pending' ? 'yellow-200' : 'green-200'} text-${project.status === 'pending' ? 'yellow-600' : 'green-600'} py-1 px-3 rounded-full text-xs">${project.status === 'pending' ? 'รอลงนาม' : 'ลงนามแล้ว'}</span>
+                    </td>
+                    <td class="py-3 px-6 text-center">
+                        <div class="flex item-center justify-center space-x-2">
+                            <button onclick="openModal('${project.status === 'pending' ? 'documentModal' : 'historyModal'}', ${project.id})" class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center hover:bg-blue-600 transition">
+                                <i class="fas fa-${project.status === 'pending' ? 'eye' : 'history'}"></i>
+                            </button>
+                            ${project.status === 'pending' ? `<button onclick="signDocument(${project.id})" class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center hover:bg-green-600 transition">
+                                <i class="fas fa-file-signature"></i>
+                            </button>` : ''}
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function updateCounts() {
+            const pendingCount = projects.filter(p => p.status === 'pending').length;
+            const completedCount = projects.filter(p => p.status === 'completed').length;
+            document.getElementById('pendingCount').innerText = pendingCount;
+            document.getElementById('completedCount').innerText = completedCount;
+            document.getElementById('totalCount').innerText = projects.length;
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active', 'bg-indigo-700', 'text-white'));
+            const activeTab = document.getElementById(`${tab}-tab`);
+            activeTab.classList.add('active', 'bg-indigo-700', 'text-white');
+            renderTable();
+            updateCounts();
+        }
+
+        function openModal(modalId, projectId) {
+            const project = projects.find(p => p.id === projectId);
+            if (!project) return;
+
+            const modalInfoHtml = `
+                <p><span class="font-semibold">ชื่อโครงงาน (TH):</span> ${project.name}</p>
+                <p><span class="font-semibold">ชื่อผู้จัดทำ:</span> ${project.students.join(', ')}</p>
+                <p><span class="font-semibold">อาจารย์ที่ปรึกษา:</span> ${project.adviser}</p>
+                <p><span class="font-semibold">อาจารย์ที่ปรึกษาร่วม:</span> ${project.co_adviser}</p>
+                <p><span class="font-semibold">วันที่แนบเอกสาร:</span> ${project.uploadDate}</p>
+            `;
+
+            let fileInfoHtml = '';
+            project.files.forEach(file => {
+                const fileIcon = file.name.endsWith('.pdf') ? 'fa-file-pdf text-red-500' : 'fa-file-word text-blue-500';
+                fileInfoHtml += `
+                    <div class="file-box flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas ${fileIcon}"></i>
+                            <span>${file.name}</span>
+                        </div>
+                        <div class="flex space-x-2">
+                            <a href="#" target="_blank" class="text-white bg-gray-400 px-4 py-2 rounded-lg hover:bg-gray-500 transition">Preview</a>
+                            <a href="${file.url}" target="_blank" class="text-white bg-blue-500 px-4 py-2 rounded-lg hover:bg-blue-600 transition">ดาวน์โหลด</a>
+                        </div>
+                    </div>
+                `;
+            });
+
+            let evaluatorStatusHtml = '';
+            if (modalId === 'documentModal') {
+                // Display president first
+                const presidentStatusClass = project.president.signed ? 'text-green-600' : 'text-red-600';
+                const presidentStatusText = project.president.signed ? 'ลงนามแล้ว' : 'รอลงนาม';
+                evaluatorStatusHtml += `<p class="font-semibold">
+                    - ประธานกรรมการ: ${project.president.name}: <span class="${presidentStatusClass}">${presidentStatusText}</span>
+                </p>`;
+
+                // Then display other evaluators
+                project.evaluators.forEach(evaluator => {
+                    const statusClass = evaluator.signed ? 'text-green-600' : 'text-red-600';
+                    const statusText = evaluator.signed ? 'ลงนามแล้ว' : 'รอลงนาม';
+                    evaluatorStatusHtml += `<p class="font-semibold">
+                        - กรรมการ: ${evaluator.name}: <span class="${statusClass}">${statusText}</span>
+                    </p>`;
+                });
+
+                document.getElementById('evaluatorStatus').innerHTML = evaluatorStatusHtml;
+                document.getElementById('signButton').onclick = () => signDocument(projectId);
+                document.getElementById('modalProjectInfo').innerHTML = modalInfoHtml;
+                document.getElementById('fileSection').innerHTML = fileInfoHtml;
+
+            } else if (modalId === 'historyModal') {
+                evaluatorStatusHtml = `<p class="font-semibold text-green-600 mb-2">คณะกรรมการลงนามครบถ้วน</p>`;
+                // Display president first
+                evaluatorStatusHtml += `<p class="text-gray-700">
+                    - ประธานกรรมการ: ${project.president.name} <i class="fas fa-check-circle text-green-500"></i>
+                </p>`;
+                // Then display other evaluators
+                project.evaluators.forEach(evaluator => {
+                    evaluatorStatusHtml += `<p class="text-gray-700">
+                        - กรรมการ: ${evaluator.name} <i class="fas fa-check-circle text-green-500"></i>
+                    </p>`;
+                });
+
+                document.getElementById('historyEvaluationStatus').innerHTML = evaluatorStatusHtml;
+                document.getElementById('historyModalProjectInfo').innerHTML = modalInfoHtml;
+                document.getElementById('historyFileSection').innerHTML = fileInfoHtml;
+            }
+
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function signDocument(projectId) {
+            const project = projects.find(p => p.id === projectId);
+            if (!project) return;
+
+            project.president.signed = true;
+            project.evaluators.forEach(e => {
+                e.signed = true;
+            });
+
+            project.status = 'completed';
+            project.signedDate = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            closeModal('documentModal');
+            showAlert('finalExamAlert');
+            setTimeout(() => {
+                hideAlert();
+                switchTab(currentTab);
+            }, 2000);
+        }
+
+        function showAlert(alertId) {
+            document.getElementById(alertId).classList.remove('hidden');
+        }
+
+        function hideAlert() {
+            document.getElementById('finalExamAlert').classList.add('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('pending-tab').addEventListener('click', (e) => {
+                e.preventDefault();
+                switchTab('pending');
+            });
+            document.getElementById('completed-tab').addEventListener('click', (e) => {
+                e.preventDefault();
+                switchTab('completed');
+            });
+
+            switchTab('pending');
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+    // Get the sidebar and the open/close buttons
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOpenBtn = document.getElementById('sidebar-open-btn'); // Add a button to open the sidebar
+    const sidebarCloseBtn = document.getElementById('sidebar-close-btn');
+
+    // Function to open the sidebar
+    function openSidebar() {
+        sidebar.classList.remove('-left-full'); // Or whichever class you use to hide it
+        sidebar.classList.add('left-0');
+    }
+
+    // Function to close the sidebar
+    function closeSidebar() {
+        sidebar.classList.remove('left-0');
+        sidebar.classList.add('-left-full'); // Or whichever class you use to hide it
+    }
+
+    // Add a click event to the close button
+    if (sidebarCloseBtn) {
+        sidebarCloseBtn.addEventListener('click', closeSidebar);
+    }
+    
+    // Add a click event to an open button (you'll need to add this to your HTML)
+    if (sidebarOpenBtn) {
+        sidebarOpenBtn.addEventListener('click', openSidebar);
+    }
+
+    // แก้ไข: ปรับโค้ดการปิด sidebar เมื่อคลิกนอกพื้นที่
+    // เพิ่มเงื่อนไขว่าโค้ดนี้จะทำงานเฉพาะบนหน้าจอขนาดเล็กกว่า 1024px เท่านั้น
+    window.addEventListener('click', function(event) {
+        if (window.innerWidth < 1024) { // ตรวจสอบขนาดหน้าจอ
+            if (!sidebar.contains(event.target) && !event.target.closest('#sidebar-open-btn')) {
+                closeSidebar();
+            }
+        }
+    });
+
+    // Add responsive behavior based on screen size
+    function handleResize() {
+        if (window.innerWidth >= 1024) { // Tailwind's 'lg' breakpoint
+            sidebar.classList.remove('fixed', '-left-full');
+            sidebar.classList.add('relative', 'left-0');
+        } else {
+            sidebar.classList.remove('relative', 'left-0');
+            sidebar.classList.add('fixed', '-left-full');
+        }
+    }
+
+    // Run on page load and on window resize
+    handleResize();
+    window.addEventListener('resize', handleResize);
+});
+    </script>
+</body>
+
+</html>

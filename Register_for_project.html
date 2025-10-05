@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ลงทะเบียน</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+        }
+        .form-select-blue:hover {
+            border-color: #3b82f6; /* Tailwind's blue-500 */
+        }
+    </style>
+
+</head>
+<body class="flex flex-col min-h-screen">
+
+<header class="bg-blue-900 shadow-md py-4">
+    <div class="container mx-auto px-6 flex items-center justify-between">
+        <a href="/" class="flex items-center space-x-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m14-6h2m-2 6h2M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+            </svg>
+            <span class="text-xl font-bold text-white">ลงทะเบียน ระบบโครงงาน พิเศษ เเละโครงงานสหกิจ</span>
+        </a>
+    </div>
+</header>
+
+    <main class="flex-grow flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-4xl">
+            <h1 class="text-3xl font-bold text-center text-blue-700 mb-6">ลงทะเบียน</h1>
+    
+            <form action="#" method="POST" class="space-y-6">
+                
+                <div class="bg-white p-4 rounded-lg shadow-md border border-gray-200">
+                    <h2 class="text-lg font-semibold text-blue-600 mb-3">ข้อมูลโครงงาน</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="project-name" class="block text-gray-700 font-semibold mb-1 text-sm">ชื่อโครงงาน</label>
+                            <input type="text" id="project-name" name="project-name" placeholder="กรอกชื่อโครงงาน" class="w-full p-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="project-type" class="block text-gray-700 font-semibold mb-1 text-sm">ประเภทโครงงาน</label>
+                            <div class="relative">
+                                <select id="project-type" name="project-type" class="block appearance-none w-full p-2 border border-gray-300 rounded-md pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors form-select-blue">
+                                    <option value="">เลือกประเภทโครงงาน</option>
+                                    <option value="special">โครงงานพิเศษ</option>
+                                    <option value="cooperative">โครงงานสหกิจ</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-4 rounded-lg shadow-md border border-gray-200">
+                        <h2 class="text-lg font-semibold text-blue-600 mb-3">ข้อมูลนักเรียน</h2>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <label class="inline-flex items-center text-sm">
+                                <input type="radio" name="group-size" value="1" class="form-radio text-blue-600 h-4 w-4">
+                                <span class="ml-1 text-gray-700">คนเดียว</span>
+                            </label>
+                            <label class="inline-flex items-center text-sm">
+                                <input type="radio" name="group-size" value="4" class="form-radio text-blue-600 h-4 w-4">
+                                <span class="ml-1 text-gray-700">สี่คน</span>
+                            </label>
+                        </div>
+        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="student-inputs">
+                            <div>
+                                <label for="student-1" class="block text-gray-700 font-semibold mb-1 text-sm">นักเรียนคนที่ 1</label>
+                                <input type="text" id="student-1" name="student-1" placeholder="ชื่อ-สกุล" class="w-full p-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label for="student-2" class="block text-gray-700 font-semibold mb-1 text-sm">นักเรียนคนที่ 2 (ถ้ามี)</label>
+                                <input type="text" id="student-2" name="student-2" placeholder="ชื่อ-สกุล" class="w-full p-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label for="student-3" class="block text-gray-700 font-semibold mb-1 text-sm">นักเรียนคนที่ 3 (ถ้ามี)</label>
+                                <input type="text" id="student-3" name="student-3" placeholder="ชื่อ-สกุล" class="w-full p-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label for="student-4" class="block text-gray-700 font-semibold mb-1 text-sm">นักเรียนคนที่ 4 (ถ้ามี)</label>
+                                <input type="text" id="student-4" name="student-4" placeholder="ชื่อ-สกุล" class="w-full p-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow-md border border-gray-200">
+                        <h2 class="text-lg font-semibold text-blue-600 mb-3">ข้อมูลการศึกษา</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
+                            <div>
+                                <label for="major" class="block text-gray-700 font-semibold mb-1 text-sm">สาขา</label>
+                                <div class="relative">
+                                    <select id="major" name="major" class="block appearance-none w-full p-2 border border-gray-300 rounded-md pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors form-select-blue">
+                                        <option value="">เลือกสาขา</option>
+                                        <option value="IT">IT</option>
+                                        <option value="ITI">ITI</option>
+                                        <option value="INE">INE</option>
+                                        <option value="INET">INET</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="grade" class="block text-gray-700 font-semibold mb-1 text-sm">ระดับชั้น</label>
+                                <div class="relative">
+                                    <select id="grade" name="grade" class="block appearance-none w-full p-2 border border-gray-300 rounded-md pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors form-select-blue">
+                                        <option value="">เลือกระดับชั้น</option>
+                                        <option value="2">ปริญญาตรีชั้นปีที่ 2</option>
+                                        <option value="3">ปริญญาตรีชั้นปีที่ 3</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+<a href="/Student/Loading_appove.html" 
+   class="block w-full text-center bg-blue-500 hover:bg-blue-600 
+          text-white font-bold py-3 rounded-md transition-colors duration-200">
+  ยืนยัน
+</a>
+
+            </form>
+        </div>
+    </main>
+     <footer class="bg-gradient-to-r from-blue-800 to-blue-900 text-white py-4 mt-auto shadow-lg">
+    <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-center md:text-left space-y-2 md:space-y-0">
+        <div class="flex items-center space-x-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            </svg>
+            <p class="font-bold text-sm md:text-base">ระบบยื่นสอบโครงงานพิเศษและโครงงานสหกิจ</p>
+            <span class="hidden md:inline text-blue-200 text-xs md:text-sm">|</span>
+            <p class="text-blue-200 text-xs md:text-sm">ภาควิชาเทคโนโลยีสารสนเทศ มจพ. วิทยาเขตปราจีน</p>
+        </div>
+
+        <div class="text-xs md:text-sm text-center md:text-right">
+            <p class="font-semibold text-blue-100">จัดทำโดย: นายกัณติกรณ์ สรสุริยวงษ์ และ นายพีรพล บัวขยาย</p>
+        </div>
+    </div>
+    
+    <hr class="border-blue-700 my-2 opacity-70">
+    
+    <p class="text-center text-xs text-blue-300">
+        &copy; 2025 King Mongkut's University of Technology North Bangkok. All Rights Reserved.
+    </p>
+</footer>
+
+</body>
+</html>

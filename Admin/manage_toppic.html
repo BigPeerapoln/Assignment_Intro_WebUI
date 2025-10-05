@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Manage Projects</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f5f7fa;
+        }
+
+        .card {
+            border-radius: 1rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.12), 0 8px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .tab-btn.active {
+            background-color: #1e40af;
+            color: white;
+        }
+
+        .modal-bg {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 1.5rem;
+        }
+
+        .modal-content-card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 1.5rem;
+        }
+
+        .modal-header {
+            background-color: #1e40af;
+            color: white;
+            padding: 1rem;
+            border-top-left-radius: 0.75rem;
+            border-top-right-radius: 0.75rem;
+        }
+
+        .alert-modal-card {
+            background-color: #ffffff;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* สไตล์สำหรับ radio buttonlist */
+        .radio-btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .radio-btn:hover {
+            background-color: #e2e8f0;
+        }
+
+        .radio-btn input[type="radio"] {
+            display: none;
+        }
+
+        .radio-btn input[type="radio"]:checked+span {
+            background-color: #1e40af;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen">
+    <header class="bg-gradient-to-r from-blue-700 to-indigo-700 text-white shadow-lg p-4 md:px-8">
+        <div class="container mx-auto flex justify-between items-center">
+            <button id="sidebar-open-btn" class="lg:hidden p-2 text-white focus:outline-none">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7">
+                    </path>
+                </svg>
+            </button>
+            <a href="Dashbroad_admin.html"
+                class="flex items-center space-x-2 hover:text-gray-300 transition-colors duration-200">
+                <svg class="h-12 w-12" width="24" height="24" viewBox="0 0 24 24" stroke-width="2.5" stroke="#ffffff"
+                    fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" />
+                    <polyline points="5 12 3 12 12 3 21 12 19 12" />
+                    <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+                    <rect x="10" y="12" width="4" height="4" />
+                </svg>
+                <h1 class="text-xl md:text-2xl font-bold">ระบบจัดการโครงงานสหกิจและโครงงานพิเศษ</h1>
+            </a>
+            <div class="flex items-center space-x-4">
+                <span class="hidden sm:block text-sm md:text-base">Admin User</span>
+                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-6 h-6 text-indigo-700">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.118a7.5 7.5 0 0115 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.5-1.632z" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-grow lg:flex-row flex-col">
+        <aside id="sidebar"
+            class="sidebar lg:relative fixed top-0 left-0 h-full overflow-y-auto z-30 lg:block lg:p-4 bg-white shadow-md flex-grow min-h-screen w-[370px] h-[1000px]">
+            <div
+                class="p-4 bg-indigo-700 text-white flex items-center justify-between lg:justify-start lg:rounded-t-lg lg:hidden">
+                <h3 class="text-xl font-bold">เมนู</h3>
+                <button id="sidebar-close-btn" class="lg:hidden text-white text-2xl">&times;</button>
+            </div>
+            <nav class="p-1 bg-white lg:rounded-b-lg">
+                <ul class="space-y-2">
+
+
+                    <li>
+                        <a href="manage_toppic.html"
+                            class="flex items-center p-3 text-white bg-indigo-600 rounded-md transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-white" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-8a1 1 0 10-2 0v4a1 1 0 102 0v-4zm5-4a1 1 0 00-1-1H7a1 1 0 00-1 1v2a1 1 0 001 1h6a1 1 0 001-1V6z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            จัดการการสอบหัวข้อโครงงาน
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/admin/check_status_project.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 7.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zM7.5 10a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5zM7.5 12.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" />
+                            </svg>
+                            ติดตามสถานะโครงงาน
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/admin/manage_final_round.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M9 2a1 1 0 00-1 1v2a1 1 0 002 0V3a1 1 0 00-1-1zM5.553 4.847a1 1 0 00-1.414 1.414l1.414 1.414a1 1 0 101.414-1.414L5.553 4.847zM3 9a1 1 0 000 2h2a1 1 0 100-2H3zM4.847 14.447a1 1 0 00-1.414-1.414l-1.414 1.414a1 1 0 101.414 1.414l1.414-1.414zM9 17a1 1 0 00-1 1v2a1 1 0 102 0v-2a1 1 0 00-1-1zM14.447 19.153a1 1 0 001.414-1.414l-1.414-1.414a1 1 0 00-1.414 1.414l1.414 1.414zM17 10a1 1 0 000-2h2a1 1 0 100 2h-2zM19.153 14.447a1 1 0 00-1.414 1.414l1.414 1.414a1 1 0 001.414-1.414l-1.414-1.414z" />
+                            </svg>
+                            จัดการการขึ้นสอบจบโครงงาน
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/admin/approve_defense.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M9 2a1 1 0 00-1 1v2a1 1 0 002 0V3a1 1 0 00-1-1zM5.553 4.847a1 1 0 00-1.414 1.414l1.414 1.414a1 1 0 101.414-1.414L5.553 4.847zM3 9a1 1 0 000 2h2a1 1 0 100-2H3zM4.847 14.447a1 1 0 00-1.414-1.414l-1.414 1.414a1 1 0 101.414 1.414l1.414-1.414zM9 17a1 1 0 00-1 1v2a1 1 0 102 0v-2a1 1 0 00-1-1zM14.447 19.153a1 1 0 001.414-1.414l-1.414-1.414a1 1 0 00-1.414 1.414l1.414 1.414zM17 10a1 1 0 000-2h2a1 1 0 100 2h-2zM19.153 14.447a1 1 0 00-1.414 1.414l1.414 1.414a1 1 0 001.414-1.414l-1.414-1.414z" />
+                            </svg>
+                            อนุมัติการสอบจบ
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/admin/Report_project_dashbroad.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M2 4a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V4zm2-2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4z"
+                                    clip-rule="evenodd" fill-rule="evenodd" />
+                                <path fill-rule="evenodd"
+                                    d="M7 6a1 1 0 00-1 1v8a1 1 0 102 0V7a1 1 0 00-1-1zM10 6a1 1 0 00-1 1v6a1 1 0 102 0V7a1 1 0 00-1-1zM13 6a1 1 0 00-1 1v4a1 1 0 102 0V7a1 1 0 00-1-1z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            แดชบอร์ดสรุปภาพรวม
+                        </a>
+                    </li>
+
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="flex-grow container mx-auto p-4 md:p-8">
+
+            <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2 text-center">ภาพรวมโครงการ</h2>
+            <div class="flex items-center justify-center text-gray-500 font-medium mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-yellow-500" viewBox="0 0 20 20"
+                    fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                        clip-rule="evenodd" />
+                </svg>
+                <span id="update-date" class="text-base sm:text-lg md:text-xl">ข้อมูลปัจจุบัน ณ วันที่ 20 กันยายน 2568
+                    เวลา
+                    15:28 น.</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                <div class="card p-6 bg-blue-100 text-blue-700">
+                    <h3 class="font-semibold text-lg mb-2">จำนวนโครงงานทั้งหมด</h3>
+                    <div class="flex flex-col items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mb-4 text-blue-500" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                            <polyline points="14 2 14 8 20 8" />
+                        </svg>
+                        <p class="text-4xl font-bold">125</p>
+                    </div>
+                </div>
+                <div class="card p-6 bg-yellow-100 text-yellow-700">
+                    <h3 class="font-semibold text-lg mb-2">รอการอนุมัติขึ้นสอบหัวข้อ</h3>
+                    <div class="flex flex-col items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mb-4 text-yellow-500" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p class="text-4xl font-bold">12</p>
+                    </div>
+                </div>
+                <div class="card p-6 bg-green-100 text-green-700">
+                    <h3 class="font-semibold text-lg mb-2">อนุมัติการขึ้นสอบไปแล้ว</h3>
+                    <div class="flex flex-col items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mb-4 text-green-500" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p class="text-4xl font-bold">103</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">รายการโครงงาน</h3>
+                <div class="flex flex-wrap items-center gap-2 mb-4">
+                    <button
+                        class="tab-btn px-4 py-2 rounded-lg bg-indigo-100 text-indigo-700 font-semibold hover:bg-indigo-200 active"
+                        data-tab="all">ทั้งหมด</button>
+                    <button
+                        class="tab-btn px-4 py-2 rounded-lg bg-indigo-100 text-indigo-700 font-semibold hover:bg-indigo-200"
+                        data-tab="IT">IT</button>
+                    <button
+                        class="tab-btn px-4 py-2 rounded-lg bg-indigo-100 text-indigo-700 font-semibold hover:bg-indigo-200"
+                        data-tab="ITI">ITI</button>
+                    <button
+                        class="tab-btn px-4 py-2 rounded-lg bg-indigo-100 text-indigo-700 font-semibold hover:bg-indigo-200"
+                        data-tab="INE">INE</button>
+                    <button
+                        class="tab-btn px-4 py-2 rounded-lg bg-indigo-100 text-indigo-700 font-semibold hover:bg-indigo-200"
+                        data-tab="INET">INET</button>
+                    <div class="flex ml-auto items-center space-x-2">
+                        <select id="secFilter"
+                            class="border rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            onchange="loadProjects(currentTab)">
+                            <option value="all">ทุก Sec</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                        </select>
+                        <input type="text" id="searchProject" placeholder="ค้นหาชื่อโครงงาน"
+                            class="border rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <button onclick="filterProject()"
+                            class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition">ค้นหา</button>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2 mb-4">
+                    <label class="radio-btn">
+                        <input type="radio" name="statusFilter" value="all" checked onchange="loadProjects(currentTab)">
+                        <span>ทั้งหมด</span>
+                    </label>
+                    <label class="radio-btn">
+                        <input type="radio" name="statusFilter" value="รอการอนุมัติ"
+                            onchange="loadProjects(currentTab)">
+                        <span>รอการอนุมัติ</span>
+                    </label>
+                    <label class="radio-btn">
+                        <input type="radio" name="statusFilter" value="อนุมัติการสอบเสร็จสิ้น"
+                            onchange="loadProjects(currentTab)">
+                        <span>อนุมัติการสอบเสร็จสิ้น</span>
+                    </label>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white">
+                        <thead>
+                            <tr class="bg-indigo-700 text-white text-sm leading-normal">
+                                <th class="py-3 px-6 text-left">ชื่อโครงงาน</th>
+                                <th class="py-3 px-6 text-left">สถานะ</th>
+                                <th class="py-3 px-6 text-center">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="projectTable" class="text-gray-600 text-sm font-light"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="projectModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-bg">
+        <div class="bg-gray-100 rounded-xl shadow-2xl w-11/12 md:w-2/3 lg:w-1/2 relative max-h-[90vh] overflow-y-auto">
+            <div class="modal-header flex justify-between items-center">
+                <h3 class="text-xl md:text-2xl font-bold">รายละเอียดโครงงาน</h3>
+                <button onclick="closeModal('projectModal')"
+                    class="text-white hover:text-gray-200 text-xl font-bold">&times;</button>
+            </div>
+            <div class="p-6 space-y-6">
+                <div class="modal-content-card p-4">
+                    <h4 class="text-lg font-bold text-indigo-700 mb-2 border-l-4 border-indigo-500 pl-2">ข้อมูลโครงการ
+                    </h4>
+                    <div class="text-gray-700 space-y-1" id="projectInfoContent"></div>
+                </div>
+                <div class="modal-content-card p-4">
+                    <h4 class="text-lg font-bold text-indigo-700 mb-2 border-l-4 border-indigo-500 pl-2">ผู้จัดทำโครงการ
+                    </h4>
+                    <div class="text-gray-700 space-y-1" id="studentContent"></div>
+                </div>
+                <div class="modal-content-card p-4">
+                    <h4 class="text-lg font-bold text-indigo-700 mb-2 border-l-4 border-indigo-500 pl-2">
+                        อาจารย์ที่ปรึกษา</h4>
+                    <div class="text-gray-700 space-y-1" id="advisorContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="appointModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-bg">
+        <div class="bg-gray-100 rounded-xl shadow-2xl w-11/12 md:w-2/3 lg:w-1/2 relative max-h-[90vh] overflow-y-auto">
+            <div class="modal-header flex justify-between items-center">
+                <h3 class="text-xl md:text-2xl font-bold">แต่งตั้งคณะกรรมการสอบ</h3>
+                <button onclick="closeModal('appointModal')"
+                    class="text-white hover:text-gray-200 text-xl font-bold">&times;</button>
+            </div>
+            <div class="p-6 space-y-6">
+                <div class="modal-content-card p-4">
+                    <h4 class="text-lg font-bold text-indigo-700 mb-2 border-l-4 border-indigo-500 pl-2">ข้อมูลโครงงาน
+                    </h4>
+                    <div class="text-gray-700 space-y-1 mb-4" id="appointProjectInfo"></div>
+
+                    <h4 class="text-lg font-bold text-indigo-700 mb-2 border-l-4 border-indigo-500 pl-2">
+                        แต่งตั้งคณะกรรมการ</h4>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="chairman" class="block text-gray-700 font-semibold mb-1">ประธานกรรมการ</label>
+                            <select id="chairman"
+                                class="w-full border rounded-md p-2 focus:ring-2 focus:ring-indigo-500"></select>
+                        </div>
+                        <div>
+                            <label for="committee1" class="block text-gray-700 font-semibold mb-1">กรรมการคนที่
+                                1</label>
+                            <select id="committee1"
+                                class="w-full border rounded-md p-2 focus:ring-2 focus:ring-indigo-500"></select>
+                        </div>
+                        <div>
+                            <label for="committee2" class="block text-gray-700 font-semibold mb-1">กรรมการคนที่
+                                2</label>
+                            <select id="committee2"
+                                class="w-full border rounded-md p-2 focus:ring-2 focus:ring-indigo-500"></select>
+                        </div>
+                        <div>
+                            <label for="committee3" class="block text-gray-700 font-semibold mb-1">กรรมการคนที่
+                                3</label>
+                            <select id="committee3"
+                                class="w-full border rounded-md p-2 focus:ring-2 focus:ring-indigo-500"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-content-card p-4">
+                    <h4 class="text-lg font-bold text-indigo-700 mb-2 border-l-4 border-indigo-500 pl-2">ข้อมูลการสอบ
+                    </h4>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="examDate" class="block text-gray-700 font-semibold mb-1">วันสอบ</label>
+                            <input type="date" id="examDate"
+                                class="w-full border rounded-md p-2 focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label for="examTime" class="block text-gray-700 font-semibold mb-1">เวลาสอบ</label>
+                            <input type="time" id="examTime"
+                                class="w-full border rounded-md p-2 focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label for="examRoom" class="block text-gray-700 font-semibold mb-1">ห้องสอบ</label>
+                            <select id="examRoom"
+                                class="w-full border rounded-md p-2 focus:ring-2 focus:ring-indigo-500">
+                                <option value="">เลือกห้องสอบ</option>
+                                <option value="B9101">B9101</option>
+                                <option value="B9102">B9102</option>
+                                <option value="B9103">B9103</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="examDetails"
+                                class="block text-gray-700 font-semibold mb-1">รายละเอียดเพิ่มเติม</label>
+                            <textarea id="examDetails" rows="4"
+                                class="w-full border rounded-md p-2 focus:ring-2 focus:ring-indigo-500"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-4 mt-6">
+                    <button onclick="closeModal('appointModal')"
+                        class="bg-gray-400 text-white px-6 py-2 rounded-lg hover:bg-gray-500 transition">ยกเลิก</button>
+                    <button onclick="submitAppointment()"
+                        class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">ยืนยันการแต่งตั้ง</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="finalExamAlert" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40 hidden">
+        <div class="alert-modal-card">
+            <svg class="mx-auto text-green-500 w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h3 class="text-2xl font-bold text-gray-800 mb-2">อนุมัติการขึ้นสอบหัวข้อสำเร็จ</h3>
+            <p class="text-gray-600">แต่งตั้งคณะกรรมการสอบเสร็จสิ้น</p>
+            <button onclick="hideAlert()"
+                class="mt-6 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-md transition-colors duration-200">OK</button>
+        </div>
+    </div>
+
+    <footer class="bg-gradient-to-r from-blue-800 to-blue-900 text-white py-4 mt-auto shadow-lg">
+        <div
+            class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-center md:text-left space-y-2 md:space-y-0">
+            <div class="flex items-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-300" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+                <p class="font-bold text-sm md:text-base">ระบบสอบโครงงานพิเศษและโครงงานสหกิจ</p>
+                <span class="hidden md:inline text-blue-200 text-xs md:text-sm">|</span>
+                <p class="text-blue-200 text-xs md:text-sm">ภาควิชาเทคโนโลยีสารสนเทศ มจพ. วิทยาเขตปราจีน</p>
+            </div>
+            <div class="text-xs md:text-sm text-center md:text-right">
+                <p class="font-semibold text-blue-100">จัดทำโดย: นายกัณติกรณ์ สรสุริยวงษ์ และ นายพีรพล บัวขยาย</p>
+            </div>
+        </div>
+        <hr class="border-blue-700 my-2 opacity-70">
+        <p class="text-center text-xs text-blue-300">
+            &copy; 2025 King Mongkut's University of Technology North Bangkok. All Rights Reserved.
+        </p>
+    </footer>
+    <script src="../Admin/js/manage_toppic.js"></script>
+</body>
+
+</html>

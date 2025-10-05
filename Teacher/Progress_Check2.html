@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ความคืบหน้าโครงงานในที่ปรึกษา</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .header-bg {
+            background-color: #1a237e;
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-container {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .project-card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+            padding: 2rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-progress {
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+            display: block;
+            text-align: center;
+        }
+
+        .btn-progress:hover {
+            background-color: #2563eb;
+        }
+
+        .progress-bar {
+            background-color: #e5e7eb;
+            border-radius: 9999px;
+            height: 1rem;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #3b82f6;
+            transition: width 0.5s ease-in-out, background-color 0.3s ease;
+        }
+
+        .progress-fill.completed {
+            background-color: #22c55e;
+        }
+
+        .progress-status {
+            font-weight: 600;
+        }
+
+        .progress-status.completed {
+            color: #22c55e;
+        }
+
+        .badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: #ef4444;
+            color: white;
+            font-weight: bold;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            animation: slideIn 0.4s ease-out;
+        }
+
+        .modal-header {
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-close-btn {
+            float: right;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #aaa;
+            transition: color 0.3s;
+        }
+
+        .modal-close-btn:hover,
+        .modal-close-btn:focus {
+            color: #333;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .timeline-item {
+            border-left: 2px solid #d1d5db;
+            padding-left: 1.5rem;
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -0.5rem;
+            top: 0;
+            width: 1rem;
+            height: 1rem;
+            background-color: #3b82f6;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .timeline-date {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .timeline-content {
+            background-color: #f9fafb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+        }
+
+        .progress-week-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .progress-week-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #4b5563;
+            min-width: 60px;
+        }
+
+        .progress-bar-small {
+            height: 0.5rem;
+            background-color: #e5e7eb;
+            border-radius: 9999px;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        .progress-fill-small {
+            height: 100%;
+            border-radius: 9999px;
+            background-color: #3b82f6;
+        }
+
+        .progress-fill-small.completed {
+            background-color: #22c55e;
+        }
+
+        .progress-fill-small.incomplete {
+            background-color: #f59e0b;
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen">
+
+    <header class="header-bg">
+        <div class="container mx-auto px-6 flex items-center justify-between">
+            <button id="sidebar-open-btn" class="lg:hidden p-2 text-white focus:outline-none">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7">
+                    </path>
+                </svg>
+            </button>
+            <span class="text-2xl font-bold">ความคืบหน้าโครงงานในที่ปรึกษา</span>
+            <span class="text-lg font-medium">ผศ.ดร.นิติการ นาคเจือทอง</span>
+        </div>
+    </header>
+    <div class="grid grid-cols-1 lg:grid-cols-12 flex-grow">
+
+        <aside id="sidebar"
+            class="sidebar lg:relative fixed top-0 left-0 h-full overflow-y-auto z-30 lg:block lg:p-4 bg-white shadow-md flex-grow min-h-screen col-span-2 w-[280px]">
+            <div
+                class="p-4 bg-indigo-700 text-white flex items-center justify-between lg:justify-start lg:rounded-t-lg lg:hidden">
+                <h3 class="text-xl font-bold">เมนู</h3>
+                <button id="sidebar-close-btn" class="lg:hidden text-white text-2xl">&times;</button>
+            </div>
+            <nav class=" bg-white lg:rounded-b-lg">
+                <ul class="space-y-2">
+                    <a href="Project_advisor_dashboard.html"
+                        class="flex items-center p-3 text-white bg-indigo-600 rounded-md transition-colors w-64">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-white" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1" />
+                        </svg>
+                        กลับหน้าหลัก
+                    </a>
+                    <li>
+                        <a href="Project_advisor_dashboard.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 7.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zM7.5 10a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5zM7.5 12.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" />
+                            </svg>
+                            เเดชบอร์ดโครงงานในที่ปรึกษา
+                        </a>
+                    </li>
+                    <li>
+                        <a href="project_list.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 7.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zM7.5 10a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5zM7.5 12.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" />
+                            </svg>
+                            ติดตามสถานะขึ้นสอบหัวข้อ
+                        </a>
+                    </li>
+                    <li>
+                        <a href="Evaluation_topic.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 7.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zM7.5 10a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5zM7.5 12.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" />
+                            </svg>
+                            ประเมินผลการสอบหัวข้อ
+                        </a>
+                    </li>
+                    <li>
+                        <a href="Progress_Check2.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M9 2a1 1 0 00-1 1v2a1 1 0 002 0V3a1 1 0 00-1-1zM5.553 4.847a1 1 0 00-1.414 1.414l1.414 1.414a1 1 0 101.414-1.414L5.553 4.847zM3 9a1 1 0 000 2h2a1 1 0 100-2H3zM4.847 14.447a1 1 0 00-1.414-1.414l-1.414 1.414a1 1 0 101.414 1.414l1.414-1.414zM9 17a1 1 0 00-1 1v2a1 1 0 102 0v-2a1 1 0 00-1-1zM14.447 19.153a1 1 0 001.414-1.414l-1.414-1.414a1 1 0 00-1.414 1.414l1.414 1.414zM17 10a1 1 0 000-2h2a1 1 0 100 2h-2zM19.153 14.447a1 1 0 00-1.414 1.414l1.414 1.414a1 1 0 001.414-1.414l-1.414-1.414z" />
+                            </svg>
+                            ความคืบหน้าโครงงานในที่ปรึกษา
+                        </a>
+                    </li>
+                    <li>
+                        <a href="Report_success_project.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M2 4a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V4zm2-2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4z"
+                                    clip-rule="evenodd" fill-rule="evenodd" />
+                                <path fill-rule="evenodd"
+                                    d="M7 6a1 1 0 00-1 1v8a1 1 0 102 0V7a1 1 0 00-1-1zM10 6a1 1 0 00-1 1v6a1 1 0 102 0V7a1 1 0 00-1-1zM13 6a1 1 0 00-1 1v4a1 1 0 102 0V7a1 1 0 00-1-1z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            สรุปผลการขึ้นสอบโครงงานจบ
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="../Director/dashbroad_director.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M2 4a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V4zm2-2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4z"
+                                    clip-rule="evenodd" fill-rule="evenodd" />
+                                <path fill-rule="evenodd"
+                                    d="M7 6a1 1 0 00-1 1v8a1 1 0 102 0V7a1 1 0 00-1-1zM10 6a1 1 0 00-1 1v6a1 1 0 102 0V7a1 1 0 00-1-1zM13 6a1 1 0 00-1 1v4a1 1 0 102 0V7a1 1 0 00-1-1z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            เเดชบอร์ดคณะกรรมการสอบ
+                        </a>
+                    </li>
+
+
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="flex-grow p-8 col-span-10">
+            <div class="container mx-auto">
+                <h1 class="text-4xl font-bold text-gray-800 mb-8">ความคืบหน้าภาพรวม ของโครงงานในที่ปรึกษาทั้งหมด</h1>
+
+                <div class="flex border-b border-gray-300 mb-6">
+                    <a href="Project_advisor_dashboard.html"
+                        class="tab-button py-3 px-6 text-center text-gray-500 font-medium">
+                        เเดชบอร์ดของโครงงานในที่ปรึกษา
+                    </a>
+                    <a href="project_list.html" class="tab-button py-3 px-6 text-center text-gray-500 font-medium">
+                        ติดตามสถานะสอบหัวข้อโครงงาน
+                    </a>
+
+                    <a href="Evaluation_topic.html" class="tab-button py-3 px-6 text-center text-gray-500 font-medium">
+                        ประเมินผลการสอบหัวข้อโครงงาน
+                    </a>
+                    <a href="Progress_Check2.html" class="tab-button py-3 px-6 text-center text-gray-500 font-medium">
+                        ความคืบหน้า โครงงานในที่ปรึกษา
+                    </a>
+
+                </div>
+
+            </div>
+            <div class="flex justify-end mb-6">
+                <a href="weekly_progress.html"
+                    class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">
+                    ตรวจสอบความคืบหน้า รายสัปดาห์
+                </a>
+            </div>
+
+            <div class="filter-container mb-8">
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div class="w-full md:w-1/2">
+                        <label for="search-box" class="block text-gray-700 font-semibold mb-2">ค้นหาชื่อโครงงาน:</label>
+                        <input type="text" id="search-box" placeholder="ค้นหาชื่อโครงงาน..."
+                            class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            onkeyup="filterProjects()">
+                    </div>
+                    <div class="w-full md:w-1/2 mt-4 md:mt-0">
+                        <label class="block text-gray-700 font-semibold mb-2">ตัวกรองสถานะ:</label>
+                        <div class="flex flex-wrap gap-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="progress-filter" value="all" checked
+                                    class="form-radio text-blue-600 h-4 w-4" onchange="filterProjects()">
+                                <span class="ml-2 text-gray-700">ทั้งหมด</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="progress-filter" value="100"
+                                    class="form-radio text-green-600 h-4 w-4" onchange="filterProjects()">
+                                <span class="ml-2 text-green-600 font-semibold">พร้อมขึ้นสอบโครงงานจบ</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="project-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            </div>
+    </div>
+    </main>
+    </div>
+    <div id="progressModal" class="modal-overlay hidden flex">
+        <div class="modal-content">
+            <span class="modal-close-btn" onclick="closeModal('progressModal')">&times;</span>
+            <div class="modal-header">
+                <h2 class="text-3xl font-bold text-gray-800" id="modal-project-name"></h2>
+                <div class="flex items-center mt-2">
+                    <div class="progress-bar flex-grow mr-4">
+                        <div id="modal-progress-fill" class="progress-fill" style="width: 0%;"></div>
+                    </div>
+                    <span id="modal-progress-text" class="text-lg font-semibold text-gray-700">0%</span>
+                </div>
+            </div>
+
+            <div id="modal-project-details" class="space-y-6">
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-gradient-to-r from-blue-800 to-blue-900 text-white py-4 mt-auto shadow-lg">
+        <div
+            class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-center md:text-left space-y-2 md:space-y-0">
+            <div class="flex items-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-300" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+                <p class="font-bold text-sm md:text-base">ระบบยื่นสอบโครงงานพิเศษและโครงงานสหกิจ</p>
+                <span class="hidden md:inline text-blue-200 text-xs md:text-sm">|</span>
+                <p class="text-blue-200 text-xs md:text-sm">ภาควิชาเทคโนโลยีสารสนเทศ มจพ. วิทยาเขตปราจีน</p>
+            </div>
+
+            <div class="text-xs md:text-sm text-center md:text-right">
+                <p class="font-semibold text-blue-100">จัดทำโดย: นายกัณติกรณ์ สรสุริยวงษ์ และ นายพีรพล บัวขยาย</p>
+            </div>
+        </div>
+
+        <hr class="border-blue-700 my-2 opacity-70">
+
+        <p class="text-center text-xs text-blue-300">
+            &copy; 2025 King Mongkut's University of Technology North Bangkok. All Rights Reserved.
+        </p>
+    </footer>
+    <script src="Progress_Check.js"></script>
+</body>
+
+</html>

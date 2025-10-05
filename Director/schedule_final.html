@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายการสอบโครงงาน</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content-card {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            max-width: 800px;
+            width: 90%;
+            position: relative;
+            transform: scale(0.95);
+            opacity: 0;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .modal.is-active .modal-content-card {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .preview-modal {
+            display: none;
+            position: fixed;
+            z-index: 110;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .preview-content {
+            width: 90%;
+            height: 90%;
+            background-color: white;
+            border-radius: 0.75rem;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .preview-content img {
+            max-width: 95%;
+            max-height: 95%;
+            border-radius: 0.75rem;
+        }
+
+        .table-row {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .table-row:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .modal-header {
+            background-color: #1e3a8a;
+            color: white;
+            padding: 1.5rem 2rem;
+            border-top-left-radius: 0.75rem;
+            border-top-right-radius: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: -2rem -2rem 2rem -2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 flex flex-col min-h-screen">
+
+    <header class="bg-blue-900 text-white shadow-lg py-6 px-8">
+        <div class="container mx-auto flex justify-between items-center">
+            <button id="sidebar-open-btn" class="lg:hidden p-2 text-white focus:outline-none">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7">
+                    </path>
+                </svg>
+            </button>
+            <h1 class="text-3xl font-bold">ระบบจัดการโครงงานพิเศษและโครงงานสหกิจ</h1>
+            <div class="flex items-center space-x-4">
+                <span class="text-lg font-medium">สวัสดี: ผศ.ดร.นิติการ นาคเจือทอง</span>
+                <a href="#" class="text-white hover:text-gray-300 transition duration-300">
+                    <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 flex-grow">
+
+        <aside id="sidebar"
+            class="sidebar lg:relative fixed top-0 left-0 h-full overflow-y-auto z-30 lg:block lg:p-4 bg-white shadow-md flex-grow min-h-screen col-span-2  w-[280px]">
+            <div
+                class="p-4 bg-indigo-700 text-white flex items-center justify-between lg:justify-start lg:rounded-t-lg lg:hidden">
+                <h3 class="text-xl font-bold">เมนู</h3>
+                <button id="sidebar-close-btn" class="lg:hidden text-white text-2xl">&times;</button>
+            </div>
+            <nav class=" bg-white lg:rounded-b-lg">
+                <ul class="space-y-2">
+
+                    <a href="dashbroad_director.html"
+                        class="flex items-center p-3 text-white bg-indigo-600 rounded-md transition-colors w-64">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-white" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1" />
+                        </svg>
+                        กลับหน้าหลัก
+                    </a>
+                    <li>
+                        <a href="exam_topics_table.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 7.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zM7.5 10a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5zM7.5 12.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" />
+                            </svg>
+                            ตารางการสอบหัวข้อโครงงาน
+                        </a>
+                    </li>
+                    <li>
+                        <a href="Evaluation_toppic.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 7.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zM7.5 10a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5zM7.5 12.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" />
+                            </svg>
+                            ประเมินผลสอบหัวข้อโครงงาน
+                        </a>
+                    </li>
+                    <li>
+                        <a href="status_topic.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M9 2a1 1 0 00-1 1v2a1 1 0 002 0V3a1 1 0 00-1-1zM5.553 4.847a1 1 0 00-1.414 1.414l1.414 1.414a1 1 0 101.414-1.414L5.553 4.847zM3 9a1 1 0 000 2h2a1 1 0 100-2H3zM4.847 14.447a1 1 0 00-1.414-1.414l-1.414 1.414a1 1 0 101.414 1.414l1.414-1.414zM9 17a1 1 0 00-1 1v2a1 1 0 102 0v-2a1 1 0 00-1-1zM14.447 19.153a1 1 0 001.414-1.414l-1.414-1.414a1 1 0 00-1.414 1.414l1.414 1.414zM17 10a1 1 0 000-2h2a1 1 0 100 2h-2zM19.153 14.447a1 1 0 00-1.414 1.414l1.414 1.414a1 1 0 001.414-1.414l-1.414-1.414z" />
+                            </svg>
+                            ติดตามสถานะโครงงาน
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="status_topic.html"
+                            class="flex items-center p-3 text-white bg-indigo-600 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-white" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-8a1 1 0 10-2 0v4a1 1 0 102 0v-4zm5-4a1 1 0 00-1-1H7a1 1 0 00-1 1v2a1 1 0 001 1h6a1 1 0 001-1V6z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            ตารางการสอบจบโครงงาน
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="Evaluation_final_Test.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M2 4a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V4zm2-2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4z"
+                                    clip-rule="evenodd" fill-rule="evenodd" />
+                                <path fill-rule="evenodd"
+                                    d="M7 6a1 1 0 00-1 1v8a1 1 0 102 0V7a1 1 0 00-1-1zM10 6a1 1 0 00-1 1v6a1 1 0 102 0V7a1 1 0 00-1-1zM13 6a1 1 0 00-1 1v4a1 1 0 102 0V7a1 1 0 00-1-1z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            ประเมินผลขึ้นสอบโครงงานจบ
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="Sign_off_project.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M2 4a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V4zm2-2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4z"
+                                    clip-rule="evenodd" fill-rule="evenodd" />
+                                <path fill-rule="evenodd"
+                                    d="M7 6a1 1 0 00-1 1v8a1 1 0 102 0V7a1 1 0 00-1-1zM10 6a1 1 0 00-1 1v6a1 1 0 102 0V7a1 1 0 00-1-1zM13 6a1 1 0 00-1 1v4a1 1 0 102 0V7a1 1 0 00-1-1z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            ลงนามเอกสารโครงงานจบ
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="flex-grow p-8 col-span-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center justify-center">
+                    <div class="text-center">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">จำนวนโครงงานที่ต้องสอบทั้งหมด</h2>
+                        <p id="totalProjects" class="text-6xl font-extrabold text-blue-600">0</p>
+                        <p class="text-gray-500">โครงงาน</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">วันสอบที่ใกล้ที่สุด</h2>
+                    <ul id="upcomingExams" class="space-y-4">
+                    </ul>
+                </div>
+            </div>
+
+            <div class="w-full bg-white rounded-xl shadow-2xl p-6">
+                <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">รายการขึ้นสอบจบโครงงาน</h1>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left table-auto">
+                        <thead>
+                            <tr class="bg-blue-600 text-white uppercase text-sm leading-normal shadow-md">
+                                <th class="py-3 px-6 text-center rounded-tl-lg">ลำดับ</th>
+                                <th class="py-3 px-6">ชื่อโครงงาน</th>
+                                <th class="py-3 px-6 text-center">สถานะ</th>
+                                <th class="py-3 px-6">ชื่อผู้จัดทำ</th>
+                                <th class="py-3 px-6 text-center rounded-tr-lg">การจัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-600 text-sm font-light">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="projectModal" class="modal">
+        <div class="modal-content-card">
+            <div class="modal-header">
+                <h3 class="text-2xl font-bold">รายละเอียดการขึ้นสอบโครงงาน</h3>
+                <button onclick="closeModal()"
+                    class="text-white hover:text-gray-300 transition-colors duration-200 text-3xl font-light">&times;</button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-2">ข้อมูลการขึ้นสอบ</h4>
+                    <p><strong>สถานที่สอบ:</strong> <span id="modalLocation"></span></p>
+                    <p><strong>เวลาสอบ:</strong> <span id="modalTime"></span></p>
+                    <p><strong>วันที่สอบ:</strong> <span id="modalDate"></span></p>
+                </div>
+
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-2">คณะกรรมการสอบ</h4>
+                    <ul id="modalCommitteeList" class="list-disc list-inside ml-4 text-gray-600">
+                    </ul>
+                </div>
+
+                <div class="p-4 bg-gray-50 rounded-lg col-span-1 md:col-span-2">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-2">รายละเอียดโครงงาน</h4>
+                    <p id="modalProjectTopic" class="text-gray-600"></p>
+                </div>
+
+                <div class="p-4 bg-gray-50 rounded-lg col-span-1 md:col-span-2">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-2">ไฟล์แนบ</h4>
+                    <div class="flex flex-col space-y-4">
+                        <div
+                            class="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                            <span class="text-blue-700 font-medium">รูปเล่มโครงงาน.pdf</span>
+                            <div class="flex space-x-2">
+                                <a id="thesisDownloadBtn" href="#" target="_blank" download
+                                    class="bg-blue-500 hover:bg-blue-600 text-white text-sm font-bold py-2 px-4 rounded-full transition-colors duration-200">ดาวน์โหลด</a>
+                                <button onclick="showPreview('thesis')"
+                                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-bold py-2 px-4 rounded-full transition-colors duration-200">Preview</button>
+                            </div>
+                        </div>
+                        <div
+                            class="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                            <span class="text-red-700 font-medium">Presentation.pptx</span>
+                            <div class="flex space-x-2">
+                                <a id="presentationDownloadBtn" href="#" target="_blank" download
+                                    class="bg-blue-500 hover:bg-blue-600 text-white text-sm font-bold py-2 px-4 rounded-full transition-colors duration-200">ดาวน์โหลด</a>
+                                <button onclick="showPreview('presentation')"
+                                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-bold py-2 px-4 rounded-full transition-colors duration-200">Preview</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="previewModal" class="preview-modal">
+        <div class="preview-content">
+            <button onclick="closePreview()"
+                class="absolute top-4 right-4 text-white text-4xl font-light z-20">&times;</button>
+            <img id="previewImage" src="" alt="Project Thesis Preview"
+                class="w-full h-full object-contain rounded-lg hidden">
+        </div>
+    </div>
+    <footer class="bg-gradient-to-r from-blue-800 to-blue-900 text-white py-4 mt-auto shadow-lg">
+        <div
+            class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-center md:text-left space-y-2 md:space-y-0">
+            <div class="flex items-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-300" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+                <p class="font-bold text-sm md:text-base">ระบบสอบโครงงานพิเศษและโครงงานสหกิจ</p>
+                <span class="hidden md:inline text-blue-200 text-xs md:text-sm">|</span>
+                <p class="text-blue-200 text-xs md:text-sm">ภาควิชาเทคโนโลยีสารสนเทศ มจพ. วิทยาเขตปราจีน</p>
+            </div>
+
+            <div class="text-xs md:text-sm text-center md:text-right">
+                <p class="font-semibold text-blue-100">จัดทำโดย: นายกัณติกรณ์ สรสุริยวงษ์ และ นายพีรพล บัวขยาย</p>
+            </div>
+        </div>
+
+        <hr class="border-blue-700 my-2 opacity-70">
+
+        <p class="text-center text-xs text-blue-300">
+            &copy; 2025 King Mongkut's University of Technology North Bangkok. All Rights Reserved.
+        </p>
+    </footer>
+
+    <script>
+        // const projects = [
+        //     {
+        //         id: 1,
+        //         name: "ระบบบริหารจัดการทรัพยากรบุคคลสำหรับธุรกิจขนาดเล็ก",
+        //         status: "100%",
+        //         authors: "นาย ก. และ นาย ข.",
+        //         details: {
+        //             topic: "พัฒนาระบบ ERP ขนาดเล็กเพื่อช่วยในการจัดการพนักงาน, เวลาทำงาน, และค่าใช้จ่าย",
+        //             location: "ห้องสอบ BA-101",
+        //             date: "25/10/2568",
+        //             time: "10:00 น.",
+        //             committee: ["อาจารย์มานะ ใจดี", "อาจารย์สมหญิง งามพร้อม", "อาจารย์วิชัย ตั้งใจ", "อาจารย์ธิดา รักเรียน"],
+        //             files: {
+        //                 thesis: "thesis_1.pdf",
+        //                 presentation: "presentation_1.pptx"
+        //             }
+        //         }
+        //     },
+        //     {
+        //         id: 2,
+        //         name: "แอปพลิเคชันแนะนำสถานที่ท่องเที่ยวเชิงวัฒนธรรม",
+        //         status: "100%",
+        //         authors: "น.ส. ศรีไพร และ นาย ยอดรัก",
+        //         details: {
+        //             topic: "พัฒนาแอปพลิเคชันมือถือที่รวบรวมและแนะนำสถานที่ท่องเที่ยวทางประวัติศาสตร์และวัฒนธรรมในภาคเหนือของไทย",
+        //             location: "ห้องสอบ BA-102",
+        //             date: "26/10/2568",
+        //             time: "13:30 น.",
+        //             committee: ["อาจารย์จันทร์ฉาย แสงจันทร์", "อาจารย์ดาวิกา สดใส", "อาจารย์กมลชนก เก่งจริง", "อาจารย์กานต์ มั่งมี"],
+        //             files: {
+        //                 thesis: "thesis_2.pdf",
+        //                 presentation: "presentation_2.pptx"
+        //             }
+        //         }
+        //     },
+        //     {
+        //         id: 3,
+        //         name: "ระบบจัดการคลังสินค้าอัตโนมัติด้วยเทคโนโลยี IoT",
+        //         status: "100%",
+        //         authors: "นาย สมศักดิ์ และ น.ส. สุดาพร",
+        //         details: {
+        //             topic: "พัฒนาระบบคลังสินค้าอัจฉริยะที่ใช้เซ็นเซอร์ IoT ในการตรวจสอบจำนวนสินค้าและอุณหภูมิแบบเรียลไทม์",
+        //             location: "ห้องสอบ BA-103",
+        //             date: "27/10/2568",
+        //             time: "09:00 น.",
+        //             committee: ["อาจารย์ปรีชา แน่นหนา", "อาจารย์รุ่งโรจน์ สุขสำราญ", "อาจารย์พงศ์เทพ รักษา", "อาจารย์สมพร มีเงิน"],
+        //             files: {
+        //                 thesis: "thesis_3.pdf",
+        //                 presentation: "presentation_3.pptx"
+        //             }
+        //         }
+        //     }
+        // ];
+        const projects = [
+            {
+                id: 1,
+                name: "ระบบบริหารจัดการทรัพยากรบุคคลสำหรับธุรกิจขนาดเล็ก",
+                status: "100%",
+                authors: "นายภูวดล เวชชนะ และ นางสาวธิติญา โพธิ์ศรี",
+                details: {
+                    topic: "พัฒนาระบบ ERP ขนาดเล็กเพื่อช่วยในการจัดการพนักงาน, เวลาทำงาน, และค่าใช้จ่าย",
+                    location: "ห้องสอบ BA-101",
+                    date: "25/10/2568",
+                    time: "10:00 น.",
+                    committee: ["ผศ.นพดล บูรณ์กุศล", "อ.สุดา รักษ์ดี", "อ.นิรันดร์ ใจเย็น", "รศ.ดร.อนิราช มิ่งขวัญ"],
+                    files: {
+                        thesis: "thesis_1.pdf",
+                        presentation: "presentation_1.pptx"
+                    }
+                }
+            },
+            {
+                id: 2,
+                name: "แอปพลิเคชันแนะนำสถานที่ท่องเที่ยวเชิงวัฒนธรรม",
+                status: "100%",
+                authors: "นายภูมิรพี เมืองไทย และ นายพิธินัย ชัยนเรศ",
+                details: {
+                    topic: "พัฒนาแอปพลิเคชันมือถือที่รวบรวมและแนะนำสถานที่ท่องเที่ยวทางประวัติศาสตร์และวัฒนธรรมในภาคเหนือของไทย",
+                    location: "ห้องสอบ BA-102",
+                    date: "26/10/2568",
+                    time: "13:30 น.",
+                    committee: ["ผศ.ดร.บีสุดา ดาวเรือง", "ผศ.ดร.ขนิษฐา นามี", "ผศ.นิมิต ศรีคำทา", "ผศ.นพดล บูรณ์กุศล"],
+                    files: {
+                        thesis: "thesis_2.pdf",
+                        presentation: "presentation_2.pptx"
+                    }
+                }
+            },
+            {
+                id: 3,
+                name: "ระบบจัดการคลังสินค้าอัตโนมัติด้วยเทคโนโลยี IoT",
+                status: "100%",
+                authors: "นายบุญญฤทธิ์ วุฒิ และ นางสาวพัทธนันต์ ขันธลักษณา",
+                details: {
+                    topic: "พัฒนาระบบคลังสินค้าอัจฉริยะที่ใช้เซ็นเซอร์ IoT ในการตรวจสอบจำนวนสินค้าและอุณหภูมิแบบเรียลไทม์",
+                    location: "ห้องสอบ BA-103",
+                    date: "27/10/2568",
+                    time: "09:00 น.",
+                    committee: ["ผศ.จสต.นพเก้า ทองใบ", "ผศ.ดร.นิติการ นาคเจือทอง", "ผศ.พีระศักดิ์ เสรีกุล", "รศ.ดร.อนิราช มิ่งขวัญ"],
+                    files: {
+                        thesis: "thesis_3.pdf",
+                        presentation: "presentation_3.pptx"
+                    }
+                }
+            }
+        ];
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDashboardCards();
+            renderProjectTable();
+        });
+
+        function renderDashboardCards() {
+            const sortedProjects = [...projects].sort((a, b) => {
+                const dateA = new Date(a.details.date.split('/').reverse().join('-'));
+                const dateB = new Date(b.details.date.split('/').reverse().join('-'));
+                return dateA - dateB;
+            });
+            document.getElementById('totalProjects').textContent = projects.length;
+            const upcomingList = document.getElementById('upcomingExams');
+            upcomingList.innerHTML = '';
+            sortedProjects.forEach(project => {
+                const li = document.createElement('li');
+                li.classList.add('flex', 'justify-between', 'items-center', 'p-4', 'bg-gray-100', 'rounded-md', 'shadow-sm', 'hover:shadow-md', 'transition-shadow', 'duration-200');
+                li.innerHTML = `
+                    <div class="flex-1">
+                        <p class="font-bold text-gray-700">${project.name}</p>
+                        <p class="text-sm text-gray-500">โดย ${project.authors}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-semibold text-blue-600">${project.details.date}</p>
+                        <p class="text-xs text-gray-500">${project.details.time}</p>
+                    </div>
+                `;
+                upcomingList.appendChild(li);
+            });
+        }
+
+        function renderProjectTable() {
+            const tableBody = document.querySelector('tbody');
+            tableBody.innerHTML = '';
+            projects.forEach(project => {
+                const row = document.createElement('tr');
+                row.classList.add('table-row', 'bg-white', 'hover:bg-gray-50', 'border-b', 'border-gray-200', 'py-10');
+                const statusColor = project.status === '100%' ? 'text-green-600' : 'text-red-600';
+                row.innerHTML = `
+                    <td class="py-3 px-6 text-center font-bold">${project.id}</td>
+                    <td class="py-3 px-6 whitespace-nowrap">${project.name}</td>
+                    <td class="py-3 px-6 text-center font-semibold ${statusColor}">${project.status}</td>
+                    <td class="py-3 px-6">${project.authors}</td>
+                    <td class="py-3 px-6 text-center">
+                        <button onclick="showDetails(${project.id})" class="bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold py-2 px-4 rounded-full transition-colors duration-200 shadow-md">
+                            รายละเอียด
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function showDetails(projectId) {
+            const project = projects.find(p => p.id === projectId);
+            if (!project) return;
+            document.getElementById('modalProjectTopic').textContent = project.details.topic;
+            document.getElementById('modalLocation').textContent = project.details.location;
+            document.getElementById('modalTime').textContent = project.details.time;
+            document.getElementById('modalDate').textContent = project.details.date;
+            const committeeList = document.getElementById('modalCommitteeList');
+            committeeList.innerHTML = '';
+            project.details.committee.forEach(member => {
+                const li = document.createElement('li');
+                li.textContent = member;
+                committeeList.appendChild(li);
+            });
+            document.getElementById('thesisDownloadBtn').href = project.details.files.thesis;
+            document.getElementById('presentationDownloadBtn').href = project.details.files.presentation;
+            const modal = document.getElementById('projectModal');
+            modal.classList.add('is-active');
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('projectModal');
+            modal.classList.remove('is-active');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+
+        function showPreview(fileType) {
+            const previewModal = document.getElementById('previewModal');
+            const previewImage = document.getElementById('previewImage');
+            if (fileType === 'thesis') {
+                previewImage.src = 'http://googleusercontent.com/image_generation_content/0';
+                previewImage.classList.remove('hidden');
+                previewModal.style.display = 'flex';
+            } else if (fileType === 'presentation') {
+                previewImage.classList.add('hidden');
+                alert('ไฟล์ชนิดนี้ไม่สามารถแสดงตัวอย่างในเบราว์เซอร์ได้โดยตรง กรุณาดาวน์โหลดเพื่อเปิดดู');
+            }
+        }
+
+        function closePreview() {
+            const previewModal = document.getElementById('previewModal');
+            previewModal.style.display = 'none';
+            document.getElementById('previewImage').src = '';
+        }
+
+        window.onclick = function (event) {
+            const modal = document.getElementById('projectModal');
+            const previewModal = document.getElementById('previewModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+            if (event.target === previewModal) {
+                closePreview();
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+    // Get the sidebar and the open/close buttons
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOpenBtn = document.getElementById('sidebar-open-btn'); // Add a button to open the sidebar
+    const sidebarCloseBtn = document.getElementById('sidebar-close-btn');
+
+    // Function to open the sidebar
+    function openSidebar() {
+        sidebar.classList.remove('-left-full'); // Or whichever class you use to hide it
+        sidebar.classList.add('left-0');
+    }
+
+    // Function to close the sidebar
+    function closeSidebar() {
+        sidebar.classList.remove('left-0');
+        sidebar.classList.add('-left-full'); // Or whichever class you use to hide it
+    }
+
+    // Add a click event to the close button
+    if (sidebarCloseBtn) {
+        sidebarCloseBtn.addEventListener('click', closeSidebar);
+    }
+    
+    // Add a click event to an open button (you'll need to add this to your HTML)
+    if (sidebarOpenBtn) {
+        sidebarOpenBtn.addEventListener('click', openSidebar);
+    }
+
+    // แก้ไข: ปรับโค้ดการปิด sidebar เมื่อคลิกนอกพื้นที่
+    // เพิ่มเงื่อนไขว่าโค้ดนี้จะทำงานเฉพาะบนหน้าจอขนาดเล็กกว่า 1024px เท่านั้น
+    window.addEventListener('click', function(event) {
+        if (window.innerWidth < 1024) { // ตรวจสอบขนาดหน้าจอ
+            if (!sidebar.contains(event.target) && !event.target.closest('#sidebar-open-btn')) {
+                closeSidebar();
+            }
+        }
+    });
+
+    // Add responsive behavior based on screen size
+    function handleResize() {
+        if (window.innerWidth >= 1024) { // Tailwind's 'lg' breakpoint
+            sidebar.classList.remove('fixed', '-left-full');
+            sidebar.classList.add('relative', 'left-0');
+        } else {
+            sidebar.classList.remove('relative', 'left-0');
+            sidebar.classList.add('fixed', '-left-full');
+        }
+    }
+
+    // Run on page load and on window resize
+    handleResize();
+    window.addEventListener('resize', handleResize);
+});
+    </script>
+</body>
+
+</html>

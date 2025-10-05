@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ตรวจสอบผลการขึ้นสอบโครงงานจบ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .status-card {
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out;
+            min-height: 250px;
+        }
+
+        .status-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .status-heading {
+            font-size: 1.5rem;
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        .status-text {
+            font-size: 1.125rem;
+            color: #4b5563;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            box-sizing: border-box;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .alert-modal-card {
+            background-color: white;
+            padding: 0;
+            border-radius: 0.5rem;
+            text-align: center;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            max-width: 500px;
+            width: 90%;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background-color: #22c55e;
+            color: white;
+            font-size: 1.25rem;
+            font-weight: bold;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .modal-body {
+            padding: 2.5rem;
+            text-align: left;
+        }
+
+        .file-icon-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            border: 2px dashed #d1d5db;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            color: #4b5563;
+            transition: border-color 0.2s ease-in-out;
+        }
+
+        .file-icon-link:hover {
+            border-color: #9ca3af;
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen">
+
+    <header class="bg-blue-800 shadow-md p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <button id="sidebar-open-btn" class="lg:hidden p-2 text-white focus:outline-none">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7">
+                    </path>
+                </svg>
+            </button>
+            <h1 class="text-xl md:text-2xl font-bold text-white">
+                ระบบยื่นสอบโครงงานพิเศษ และโครงงานสหกิจ
+            </h1>
+            <div class="flex items-center space-x-4">
+
+                <!-- ชื่อนักเรียน -->
+                <span class="text-white font-semibold">กัณติกรณ์</span>
+                <div class="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                    <img src="../img_system/student.jpg" alt="Student Profile" class="object-cover w-full h-full">
+                </div>
+            </div>
+        </div>
+    </header>
+
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 flex-grow">
+
+        <aside id="sidebar"
+            class="sidebar lg:relative fixed top-0 left-0 h-full overflow-y-auto z-30 lg:block lg:p-4 bg-white shadow-md flex-grow min-h-screen col-span-2 w-[280px]">
+            <div
+                class="p-4 bg-indigo-700 text-white flex items-center justify-between lg:justify-start lg:rounded-t-lg lg:hidden">
+                <h3 class="text-xl font-bold">เมนู</h3>
+                <button id="sidebar-close-btn" class="lg:hidden text-white text-2xl">&times;</button>
+            </div>
+            <nav class="p-1 bg-white lg:rounded-b-lg">
+                <ul class="space-y-2">
+                    <a href="Main_student_final.html"
+                        class="flex items-center p-3 text-white bg-indigo-600 rounded-md transition-colors w-64">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-white" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1" />
+                        </svg>
+                        กลับหน้าหลัก
+                    </a>
+                    <li>
+                        <a href="Check_status_success.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 7.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zM7.5 10a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5zM7.5 12.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" />
+                            </svg>
+                            ตรวจสอบผลการสอบหัวข้อ
+                        </a>
+                    </li>
+                    <li>
+                        <a href="Progress_report.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 7.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zM7.5 10a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5zM7.5 12.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" />
+                            </svg>
+                            ข้อมูลความคืบหน้าโครงงาน
+                        </a>
+                    </li>
+                    <li>
+                        <a href="final_check_state.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M9 2a1 1 0 00-1 1v2a1 1 0 002 0V3a1 1 0 00-1-1zM5.553 4.847a1 1 0 00-1.414 1.414l1.414 1.414a1 1 0 101.414-1.414L5.553 4.847zM3 9a1 1 0 000 2h2a1 1 0 100-2H3zM4.847 14.447a1 1 0 00-1.414-1.414l-1.414 1.414a1 1 0 101.414 1.414l1.414-1.414zM9 17a1 1 0 00-1 1v2a1 1 0 102 0v-2a1 1 0 00-1-1zM14.447 19.153a1 1 0 001.414-1.414l-1.414-1.414a1 1 0 00-1.414 1.414l1.414 1.414zM17 10a1 1 0 000-2h2a1 1 0 100 2h-2zM19.153 14.447a1 1 0 00-1.414 1.414l1.414 1.414a1 1 0 001.414-1.414l-1.414-1.414z" />
+                            </svg>
+                            ติดตามสถานะสอบโครงงานจบ
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="Check_final_project_success.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M2 4a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V4zm2-2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4z"
+                                    clip-rule="evenodd" fill-rule="evenodd" />
+                                <path fill-rule="evenodd"
+                                    d="M7 6a1 1 0 00-1 1v8a1 1 0 102 0V7a1 1 0 00-1-1zM10 6a1 1 0 00-1 1v6a1 1 0 102 0V7a1 1 0 00-1-1zM13 6a1 1 0 00-1 1v4a1 1 0 102 0V7a1 1 0 00-1-1z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            ตรวจสอบผลสอบโครงงานจบ
+                        </a>
+                    </li>
+
+
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="flex-grow p-8 col-span-10">
+            <div class="text-center mb-6">
+                <h1 class="text-4xl font-bold text-gray-800">ตรวจสอบผลการขึ้นสอบโครงงานจบ</h1>
+                <p class="text-lg text-gray-600 mt-2">สถานะและขั้นตอนสุดท้ายของการจบโครงงาน</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-xl p-6 mb-8">
+                <div class="bg-green-500 rounded-t-lg -mx-6 -mt-6 p-4 mb-4">
+                    <h2 class="text-2xl font-bold text-white drop-shadow">สถานะการสอบโครงงาน</h2>
+                </div>
+                <div
+                    class="flex flex-col md:flex-row justify-between items-stretch space-y-6 md:space-y-0 md:space-x-4 relative">
+                    <div class="hidden md:block absolute top-1/4 left-0 w-full z-0">
+                        <div class="h-1 bg-gray-300 w-full"></div>
+                        <div id="progressLine"
+                            class="h-1 bg-green-500 absolute top-0 left-0 transition-all duration-500 ease-in-out">
+                        </div>
+                    </div>
+
+                    <div
+                        class="status-card rounded-lg p-6 text-center flex-1 md:z-10 w-full md:w-auto flex flex-col items-center justify-between">
+                        <div>
+                            <div id="step1Icon"
+                                class="w-16 h-16 rounded-full bg-gray-400 text-white flex items-center justify-center mx-auto mb-4 transition-colors duration-300">
+                                <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM5 10a5 5 0 1110 0 5 5 0 01-10 0z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <h3 id="step1Title" class="font-bold text-xl text-gray-600 transition-colors duration-300">
+                                ผลการสอบโครงงานจบ
+                            </h3>
+                            <p id="step1Text" class="text-gray-600 mt-1 text-base">
+                                ท่านผ่านการสอบโครงงาน
+                            </p>
+                        </div>
+                        <button id="showResultsBtn" onclick="showModal('examResultsModal')"
+                            class="bg-gray-400 text-white font-bold py-2 px-4 rounded-md mt-4 cursor-not-allowed transition-colors duration-200"
+                            disabled>
+                            ดูรายละเอียด
+                        </button>
+                    </div>
+
+                    <div
+                        class="status-card rounded-lg p-6 text-center flex-1 md:z-10 w-full md:w-auto flex flex-col items-center justify-between">
+                        <div>
+                            <div id="step2Icon"
+                                class="w-16 h-16 rounded-full bg-gray-400 text-white flex items-center justify-center mx-auto mb-4 transition-colors duration-300">
+                                <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM5 10a5 5 0 1110 0 5 5 0 01-10 0z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <h3 id="step2Title" class="font-bold text-xl text-gray-600 transition-colors duration-300">
+                                แนบเอกสาร
+                            </h3>
+                            <p id="step2Text" class="text-gray-600 mt-1 text-base">
+                                แนบเอกสารรูปเล่มเพื่อรอลงนาม
+                            </p>
+                        </div>
+                        <button id="showUploadedFileBtn" onclick="showModal('uploadCompleteModal')"
+                            class="bg-gray-400 text-white font-bold py-2 px-4 rounded-md mt-4 cursor-not-allowed transition-colors duration-200"
+                            disabled>
+                            ดูไฟล์ที่แนบ
+                        </button>
+                    </div>
+
+                    <div
+                        class="status-card rounded-lg p-6 text-center flex-1 md:z-10 w-full md:w-auto flex flex-col items-center justify-between">
+                        <div>
+                            <div id="step3Icon"
+                                class="w-16 h-16 rounded-full bg-gray-400 text-white flex items-center justify-center mx-auto mb-4 transition-colors duration-300">
+                                <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM5 10a5 5 0 1110 0 5 5 0 01-10 0z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <h3 id="step3Title" class="font-bold text-xl text-gray-600 transition-colors duration-300">
+                                รอลงนาม
+                            </h3>
+                            <p id="step3Text" class="text-gray-600 mt-1 text-base">
+                                รอการลงนามจากคณะกรรมการ
+                            </p>
+                        </div>
+                        <div class="mt-4 w-full"></div>
+                    </div>
+
+                    <div
+                        class="status-card rounded-lg p-6 text-center flex-1 md:z-10 w-full md:w-auto flex flex-col items-center justify-between">
+                        <div>
+                            <div id="step4Icon"
+                                class="w-16 h-16 rounded-full bg-gray-400 text-white flex items-center justify-center mx-auto mb-4 transition-colors duration-300">
+                                <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM5 10a5 5 0 1110 0 5 5 0 01-10 0z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <h3 id="step4Title" class="font-bold text-xl text-gray-600 transition-colors duration-300">
+                                จบโครงงาน
+                            </h3>
+                            <p id="step4Text" class="text-gray-600 mt-1 text-base">
+                                ท่านจบโครงงานโดยสมบูรณ์
+                            </p>
+                        </div>
+                        <div class="mt-4 w-full"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="final-card" class="hidden w-full bg-green-200 rounded-lg shadow-xl p-6 md:p-10 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold text-green-800 mb-4">จบโครงงานโดยสมบูรณ์</h2>
+                <p class="text-xl md:text-2xl font-semibold text-green-700">ขอแสดงความยินดี 🎉</p>
+                <p id="completion-date" class="mt-4 text-lg text-gray-600">ณ วันที่ 20 กันยายน 2568</p>
+            </div>
+
+        </main>
+    </div>
+    <div id="examResultsModal" class="modal">
+        <div class="alert-modal-card">
+            <div class="modal-header">
+                ผลการประเมิน
+            </div>
+            <div class="modal-body">
+                <div class="space-y-4 text-gray-700">
+                    <h3 class="font-semibold text-lg text-center">ผลการสอบโครงงานจบ</h3>
+                    <div class="text-center">
+                        <span
+                            class="inline-block bg-green-200 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">
+                            ผ่านทั้งหมด
+                        </span>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-800 mb-1">คณะกรรมการ:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li>รศ.ดร.อนิราช มิ่งขวัญ (ประธานกรรมการ) <span
+                                    class="text-green-600 font-bold ml-2">ผ่าน</span></li>
+                            <li>ผศ.ดร.นิติการ นาคเจือทอง (กรรมการ) <span
+                                    class="text-green-600 font-bold ml-2">ผ่าน</span></li>
+                            <li>ผศ.ดร.วันทนี ประจวบศุภกิจ (กรรมการ) <span
+                                    class="text-green-600 font-bold ml-2">ผ่าน</span></li>
+                            <li>ผศ.ดร.สุพาภรณ์ ซิ้มเจริญ (กรรมการ)<span class="text-green-600 font-bold ml-2">ผ่าน
+                                </span></li>
+
+                        </ul>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-800 mb-1">ข้อเสนอแนะเพิ่มเติม:</p>
+                        <ul class="list-disc list-inside ml-4">
+                            <li>ไม่มีข้อเสนอแนะเพิ่มเติม</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="mt-6 text-sm text-gray-600 text-center">เมื่อดำเนินการแก้ไขเสร็จสิ้น
+                    โปรดส่งไฟล์โครงงานฉบับสมบูรณ์ให้คณะกรรมการลงนาม</p>
+                <button onclick="closeModal('examResultsModal')"
+                    class="mt-6 w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 rounded-md transition-colors duration-200">
+                    ปิด
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="uploadCompleteModal" class="modal">
+        <div class="alert-modal-card">
+            <div class="modal-header">
+                ไฟล์เล่มสมบูรณ์
+            </div>
+            <div class="modal-body">
+                <div class="space-y-4 text-gray-700">
+                    <div class="text-center">
+                        <a href="final-project.pdf" target="_blank" class="file-icon-link">
+                            <svg class="w-10 h-10 text-gray-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2-2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414a2 2 0 00-.586-1.414L11.414 2.586A2 2 0 0010 2H6zM10 10a1 1 0 00-1 1v2a1 1 0 102 0v-2a1 1 0 00-1-1z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <div>
+                                <h4 class="font-semibold text-lg" id="fileName"></h4>
+                                <p class="text-sm text-gray-500" id="fileDate"></p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <button onclick="closeModal('uploadCompleteModal')"
+                    class="mt-6 w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 rounded-md transition-colors duration-200">
+                    ปิด
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-gradient-to-r from-blue-800 to-blue-900 text-white py-4 mt-auto shadow-lg">
+        <div
+            class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-center md:text-left space-y-2 md:space-y-0">
+            <div class="flex items-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-300" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+                <p class="font-bold text-sm md:text-base">ระบบยื่นสอบโครงงานพิเศษและโครงงานสหกิจ</p>
+                <span class="hidden md:inline text-blue-200 text-xs md:text-sm">|</span>
+                <p class="text-blue-200 text-xs md:text-sm">ภาควิชาเทคโนโลยีสารสนเทศ มจพ. วิทยาเขตปราจีน</p>
+            </div>
+
+            <div class="text-xs md:text-sm text-center md:text-right">
+                <p class="font-semibold text-blue-100">จัดทำโดย: นายกัณติกรณ์ สรสุริยวงษ์ และ นายพีรพล บัวขยาย</p>
+            </div>
+        </div>
+
+        <hr class="border-blue-700 my-2 opacity-70">
+
+        <p class="text-center text-xs text-blue-300">
+            &copy; 2025 King Mongkut's University of Technology North Bangkok. All Rights Reserved.
+        </p>
+    </footer>
+    <script>
+        const projectFile = {
+            name: "Final_Project_Report_CS123.pdf",
+            date: "ส่งเมื่อวันที่ 15 กันยายน 2568"
+        };
+
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                // For the upload modal, update dynamic content
+                if (modalId === 'uploadCompleteModal') {
+                    document.getElementById('fileName').textContent = projectFile.name;
+                    document.getElementById('fileDate').textContent = projectFile.date;
+                }
+                modal.style.display = 'flex';
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        function updateStatus(status) {
+            const progressLine = document.getElementById('progressLine');
+            const finalCard = document.getElementById('final-card');
+
+            const steps = [
+                { id: 'step1', button: 'showResultsBtn', title: 'step1Title', text: 'step1Text' },
+                { id: 'step2', button: 'showUploadedFileBtn', title: 'step2Title', text: 'step2Text' },
+                { id: 'step3', button: null, title: 'step3Title', text: 'step3Text' },
+                { id: 'step4', button: null, title: 'step4Title', text: 'step4Text' }
+            ];
+
+            // Reset all states
+            steps.forEach((step) => {
+                const icon = document.getElementById(`${step.id}Icon`);
+                const title = document.getElementById(step.title);
+                const text = document.getElementById(step.text);
+                icon.classList.remove('bg-green-500');
+                icon.classList.add('bg-gray-400');
+                title.classList.remove('text-green-600', 'font-bold');
+                title.classList.add('text-gray-600');
+                text.classList.remove('text-green-600', 'font-bold');
+                text.classList.add('text-gray-600');
+                if (step.button) {
+                    const button = document.getElementById(step.button);
+                    button.classList.remove('bg-green-500', 'hover:bg-green-600');
+                    button.classList.add('bg-gray-400', 'cursor-not-allowed');
+                    button.disabled = true;
+                }
+            });
+            finalCard.classList.add('hidden');
+
+            // Update based on the current status
+            if (status >= 1) {
+                const step = steps[0];
+                const icon = document.getElementById(`${step.id}Icon`);
+                const title = document.getElementById(step.title);
+                const button = document.getElementById(step.button);
+                icon.classList.remove('bg-gray-400');
+                icon.classList.add('bg-green-500');
+                title.classList.add('text-green-600', 'font-bold');
+                button.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                button.classList.add('bg-green-500', 'hover:bg-green-600');
+                button.disabled = false;
+            }
+            if (status >= 2) {
+                const step = steps[1];
+                const icon = document.getElementById(`${step.id}Icon`);
+                const title = document.getElementById(step.title);
+                const text = document.getElementById(step.text);
+                const button = document.getElementById(step.button);
+                icon.classList.remove('bg-gray-400');
+                icon.classList.add('bg-green-500');
+                title.classList.add('text-green-600', 'font-bold');
+                text.innerHTML = 'แนบไฟล์เล่มสมบูรณ์เสร็จสิ้น';
+                text.classList.add('text-green-600', 'font-bold');
+                button.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                button.classList.add('bg-green-500', 'hover:bg-green-600');
+                button.disabled = false;
+            }
+            if (status >= 3) {
+                const step = steps[2];
+                const icon = document.getElementById(`${step.id}Icon`);
+                const title = document.getElementById(step.title);
+                const text = document.getElementById(step.text);
+                icon.classList.remove('bg-gray-400');
+                icon.classList.add('bg-green-500');
+                title.classList.add('text-green-600', 'font-bold');
+                text.innerHTML = 'คณะกรรมการลงนามเสร็จสิ้น';
+                text.classList.add('text-green-600', 'font-bold');
+            }
+            if (status >= 4) {
+                const step = steps[3];
+                const icon = document.getElementById(`${step.id}Icon`);
+                const title = document.getElementById(step.title);
+                const text = document.getElementById(step.text);
+                icon.classList.remove('bg-gray-400');
+                icon.classList.add('bg-green-500');
+                title.classList.add('text-green-600', 'font-bold');
+                text.classList.add('text-green-600', 'font-bold');
+                finalCard.classList.remove('hidden');
+            }
+
+            // Update progress bar width
+            const progress = (status - 1) * 33.33;
+            progressLine.style.width = `${progress}%`;
+        }
+
+        // Initialize status on page load (e.g., status 4 for a completed project)
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStatus(4);
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get the sidebar and the open/close buttons
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOpenBtn = document.getElementById('sidebar-open-btn'); // Add a button to open the sidebar
+            const sidebarCloseBtn = document.getElementById('sidebar-close-btn');
+
+            // Function to open the sidebar
+            function openSidebar() {
+                sidebar.classList.remove('-left-full'); // Or whichever class you use to hide it
+                sidebar.classList.add('left-0');
+            }
+
+            // Function to close the sidebar
+            function closeSidebar() {
+                sidebar.classList.remove('left-0');
+                sidebar.classList.add('-left-full'); // Or whichever class you use to hide it
+            }
+
+            // Add a click event to the close button
+            if (sidebarCloseBtn) {
+                sidebarCloseBtn.addEventListener('click', closeSidebar);
+            }
+
+            // Add a click event to an open button (you'll need to add this to your HTML)
+            if (sidebarOpenBtn) {
+                sidebarOpenBtn.addEventListener('click', openSidebar);
+            }
+
+            // แก้ไข: ปรับโค้ดการปิด sidebar เมื่อคลิกนอกพื้นที่
+            // เพิ่มเงื่อนไขว่าโค้ดนี้จะทำงานเฉพาะบนหน้าจอขนาดเล็กกว่า 1024px เท่านั้น
+            window.addEventListener('click', function (event) {
+                if (window.innerWidth < 1024) { // ตรวจสอบขนาดหน้าจอ
+                    if (!sidebar.contains(event.target) && !event.target.closest('#sidebar-open-btn')) {
+                        closeSidebar();
+                    }
+                }
+            });
+
+            // Add responsive behavior based on screen size
+            function handleResize() {
+                if (window.innerWidth >= 1024) { // Tailwind's 'lg' breakpoint
+                    sidebar.classList.remove('fixed', '-left-full');
+                    sidebar.classList.add('relative', 'left-0');
+                } else {
+                    sidebar.classList.remove('relative', 'left-0');
+                    sidebar.classList.add('fixed', '-left-full');
+                }
+            }
+
+            // Run on page load and on window resize
+            handleResize();
+            window.addEventListener('resize', handleResize);
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สถานะการอนุมัติโครงงาน</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* ทำให้ Card อยู่กึ่งกลางแนวตั้ง */
+            padding: 2rem; /* เพิ่ม padding รอบๆ */
+        }
+
+        .status-card {
+            border: 2px solid transparent;
+            border-radius: 1rem; /* ทำให้ขอบมนขึ้น */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            text-align: center;
+            transition: all 0.5s ease-in-out;
+            max-width: 900px; /* เพิ่มขนาดสูงสุดของ Card */
+            width: 95%; /* ขยายความกว้าง */
+            padding: 5rem 3rem; /* เพิ่มขนาด padding ภายใน Card ให้ใหญ่ขึ้น */
+        }
+        
+        /* สถานะรอการอนุมัติ (สีเหลืองคลีนๆ) */
+        .status-waiting {
+            background-color: #fffbeb; /* yellow-100 */
+            border-color: #fcd34d; /* yellow-300 */
+            color: #b45309; /* yellow-800 */
+        }
+        
+        /* สถานะอนุมัติแล้ว (สีเขียวคลีนๆ) */
+        .status-approved {
+            background-color: #ecfdf5; /* green-50 */
+            border-color: #34d399; /* green-400 */
+            color: #047857; /* green-700 */
+        }
+
+        .status-icon {
+            margin-bottom: 1.5rem; /* เพิ่มระยะห่างด้านล่างไอคอน */
+            height: 5rem; /* ทำให้ไอคอนใหญ่ขึ้น */
+            width: 5rem; /* ทำให้ไอคอนใหญ่ขึ้น */
+        }
+
+        .main-title {
+            font-weight: 700; /* ตัวหนามาก */
+            font-size: 2.25rem; /* ขนาดใหญ่ขึ้น */
+            line-height: 1.2;
+        }
+
+        .main-text {
+            font-weight: 600; /* ตัวหนาปานกลาง */
+            font-size: 1.5rem; /* ขนาดใหญ่ขึ้น */
+            margin-top: 1rem;
+        }
+
+        .login-button {
+            margin-top: 2.5rem; /* เพิ่มระยะห่างด้านบนปุ่ม */
+            background-color: #10b981; /* green-500 */
+            color: #fff;
+            padding: 1rem 3rem; /* เพิ่มขนาดปุ่ม */
+            border-radius: 0.75rem; /* ทำให้ขอบมนขึ้น */
+            font-weight: 700; /* ตัวหนา */
+            font-size: 1.25rem; /* ขนาดตัวอักษรปุ่มใหญ่ขึ้น */
+            display: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .login-button:hover {
+            background-color: #059669; /* green-700 */
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="status-card" class="status-card status-waiting">
+        <div class="flex justify-center">
+            <svg id="pending-icon" xmlns="http://www.w3.org/2000/svg" class="status-icon" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.75a.75.75 0 00-1.5 0v4.25a.75.75 0 001.5 0V6.25zm0 6.5a.75.75 0 10-1.5 0 .75.75 0 001.5 0z" clip-rule="evenodd" />
+            </svg>
+
+            <svg id="approved-icon" xmlns="http://www.w3.org/2000/svg" class="status-icon hidden" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+        </div>
+        <h3 id="main-title" class="main-title">รออาจารย์ประจำรายวิชา รับทราบ และอนุมัติ</h3>
+        <p id="main-text" class="main-text">เพื่อเข้าใช้งานระบบโครงงาน</p>
+
+        <a href="../login.html" id="login-button" class="login-button">
+            เข้าสู่ระบบ
+        </a>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const statusCard = document.getElementById('status-card');
+            const mainTitle = document.getElementById('main-title');
+            const mainText = document.getElementById('main-text');
+            const loginButton = document.getElementById('login-button');
+            const pendingIcon = document.getElementById('pending-icon');
+            const approvedIcon = document.getElementById('approved-icon');
+            
+            // กำหนดเวลาหน่วง (ในหน่วยมิลลิวินาที) เช่น 5000 = 5 วินาที
+            const delayTime = 5000; 
+
+            // ฟังก์ชันสำหรับอัปเดตสถานะการอนุมัติ
+            function updateStatus() {
+                // เปลี่ยนสี Card
+                statusCard.classList.remove('status-waiting');
+                statusCard.classList.add('status-approved');
+
+                // เปลี่ยนไอคอน
+                pendingIcon.classList.add('hidden');
+                approvedIcon.classList.remove('hidden');
+
+                // เปลี่ยนข้อความ
+                mainTitle.textContent = 'อาจารย์ประจำรายวิชาได้อนุมัติแล้ว';
+                mainText.textContent = 'สามารถเข้าสู่ระบบเพื่อเข้าเสนอหัวข้อโครงงาน และทำตามขั้นตอนต่อไป';
+
+                // แสดงปุ่มเข้าสู่ระบบ
+                loginButton.style.display = 'inline-block';
+            }
+
+            // เรียกใช้ฟังก์ชัน updateStatus() หลังจากหน่วงเวลาที่กำหนด
+            setTimeout(updateStatus, delayTime);
+        });
+    </script>
+
+</body>
+</html>

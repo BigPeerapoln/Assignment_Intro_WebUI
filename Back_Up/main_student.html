@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หน้าหลักนักศึกษา</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
+ 
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .progress-bar {
+            transition: width 1s ease-in-out;
+        }
+
+        .top-menu-item {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .top-menu-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content-card {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+        }
+
+        .alert-modal-card {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #ef4444;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen">
+
+    <header class="bg-blue-800 shadow-md p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold text-white">ระบบยื่นสอบโครงงานพิเศษ เเละโครงงานสหกิจ ภาควิชาเทคโนโลยีสารสนเทศ</h1>
+            <div class="flex items-center space-x-4">
+                <span class="text-white font-semibold">ชื่อนักเรียน</span>
+                <div class="w-10 h-10 bg-rounded-full"></div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="bg-gray-100 p-4 shadow-sm">
+        <div
+            class="container mx-auto flex flex-col md:flex-row justify-center items-center space-y-2 md:space-y-0 md:space-x-4">
+            <a href="#" onclick="showProposalForm()"
+                class="top-menu-item bg-white text-blue-800 font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-gray-200">
+                เสนอหัวข้อโครงงาน
+            </a>
+            <a href="#" onclick="showStatusPage()"
+                class="top-menu-item bg-white text-blue-800 font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-gray-200">
+                ติดตามสถานะการอนุมัติขึ้นสอบหัวข้อ
+            </a>
+            <a href="#" onclick="showNotificationDetails()"
+                class="relative top-menu-item bg-white text-blue-800 font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-gray-200">
+                รายละเอียดการสอบ
+                <span id="notificationBadge" class="notification-badge hidden"></span>
+            </a>
+            <a href="#"
+                class="top-menu-item bg-white text-blue-800 font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-gray-200">
+                ตรวจสอบผลการสอบหัวข้อโครงงาน
+            </a>
+            <a href="#"
+                class="top-menu-item bg-white text-blue-800 font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-gray-200">
+                ตรวจสอบผลการขึ้นสอบโครงงาน
+            </a>
+        </div>
+    </nav>
+
+    <main class="flex-grow container mx-auto p-4 flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+
+        <div id="projectDetailsContent" class="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <div class="bg-white rounded-lg shadow-md w-full overflow-hidden">
+
+                <div class="bg-blue-600 text-white p-4">
+                    <h2 class="text-xl font-bold text-center">รายละเอียดโครงงาน</h2>
+                </div>
+
+                <div class="p-6 space-y-6 text-gray-800">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="bg-blue-400 text-white rounded-t-lg -mx-6 -mt-6 p-4">
+                            <h3 class="text-xl font-bold">ข้อมูลโครงงาน</h3>
+                        </div>
+
+                        <div class="space-y-4 pt-4">
+                           
+                            <div>
+                                <p class="font-bold text-gray-700">ชื่อภาษาไทย: <span
+                                        class="font-normal">ระบบแนะนำที่พักสำหรับนักท่องเที่ยว</span></p>
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-700">ชื่อโครงงานภาษาอังกฤษ: <span
+                                        class="font-normal">Tourist Accommodation Recommendation System</span></p>
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-700">ขอบเขตโครงงาน: <span
+                                        class="font-normal">การพัฒนาเว็บไซต์ที่ช่วยค้นหาและแนะนำที่พัก</span></p>
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-700">อาจารย์ที่ปรึกษาโครงงาน: <span class="font-normal">อ.
+                                        สมชาย ใจดี</span></p>
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-700">อาจารย์ที่ปรึกษาร่วม: <span class="font-normal">อ.
+                                        สมหญิง รักเรียน</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-center mt-4">
+                        <button
+                            class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-md hover:bg-blue-700 transition-colors duration-200">
+                            ประวัติการอัปเดตงาน
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-blue-500 p-6 rounded-lg shadow-md flex flex-col items-center justify-center text-white">
+                <h2 class="text-2xl font-bold mb-4">สถานะการติดตาม</h2>
+                <p class="text-lg font-medium">ความคืบหน้าของโครงงาน</p>
+                <div class="w-full bg-blue-200 rounded-full h-4 mt-2 mb-2">
+                    <div id="progressBar" class="bg-blue-800 h-4 rounded-full progress-bar" style="width: 0%;"></div>
+                </div>
+                <p id="progressText" class="text-xl font-bold text-white">0%</p>
+                <button
+                    class="bg-white text-blue-800 font-bold py-2 px-6 rounded-md hover:bg-gray-100 transition-colors duration-200 mt-4">
+                    เพิ่มความคืบหน้า
+                </button>
+            </div>
+
+        </div>
+
+        <div id="statusContent" class="hidden flex-grow flex items-center justify-center p-4">
+            <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-2xl">
+                <h2 class="text-2xl font-bold text-center text-blue-800 mb-6">สถานะการอนุมัติขึ้นสอบหัวข้อ</h2>
+
+                <div class="flex flex-col md:flex-row items-center justify-between relative space-y-8 md:space-y-0">
+                    <div class="absolute top-1/2 left-0 w-full transform -translate-y-1/2 hidden md:block">
+                        <div class="h-1 bg-gray-300 w-full"></div>
+                        <div id="progressLine"
+                            class="h-1 bg-green-500 absolute top-0 left-0 transition-all duration-500 ease-in-out"
+                            style="width: 0%;"></div>
+                    </div>
+
+                    <div class="flex flex-col items-center z-10 w-full md:w-1/3">
+                        <div
+                            class="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center mb-2">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <p class="text-sm font-semibold text-center text-gray-800">ยื่นเสนอหัวข้อโครงงาน</p>
+                    </div>
+
+                    <div class="flex flex-col items-center z-10 w-full md:w-1/3">
+                        <div id="step2Icon"
+                            class="w-10 h-10 rounded-full bg-gray-400 text-white flex items-center justify-center mb-2">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM5 10a5 5 0 1110 0 5 5 0 01-10 0z"></path>
+                            </svg>
+                        </div>
+                        <p id="step2Text" class="text-sm font-semibold text-center text-gray-600">รอผู้ดูแลระบบอนุมัติ
+                        </p>
+                    </div>
+
+                    <div class="flex flex-col items-center z-10 w-full md:w-1/3">
+                        <div id="step3Icon"
+                            class="w-10 h-10 rounded-full bg-gray-400 text-white flex items-center justify-center mb-2">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM5 10a5 5 0 1110 0 5 5 0 01-10 0z"></path>
+                            </svg>
+                        </div>
+                        <p id="step3Text" class="text-sm font-semibold text-center text-gray-600">อนุมัติการขึ้นสอบ
+                            หัวข้อโครงงาน</p>
+                    </div>
+                </div>
+
+                <div class="text-center mt-8">
+                    <p class="text-center text-gray-500 text-sm mb-4">สถานะการตรวจสอบล่าสุด ณ วันที่ 13 กันยายน 2568</p>
+                    <button id="viewDetailsBtn" onclick="showNotificationDetails()"
+                        class="hidden bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-md transition-colors duration-200">
+                        ดูรายละเอียดและเวลานัดหมาย
+                    </button>
+                </div>
+
+            </div>
+        </div>
+<div id="notificationCard" class="hidden flex-grow flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
+        <!-- Header -->
+        <div class="bg-blue-800 text-white px-6 py-4 text-center">
+            <h2 class="text-2xl font-bold">รายละเอียดการสอบหัวข้อโครงงาน</h2>
+        </div>
+
+        <!-- Body -->
+        <div class="p-8 space-y-4">
+            <p class="text-xl">
+                <strong>สถานะ:</strong>
+                <span class="text-green-600 font-bold">อนุมัติให้ขึ้นสอบหัวข้อโครงงาน</span>
+            </p>
+            <p class="text-xl"><strong>อนุมัติเมื่อ:</strong> 13 กันยายน 2568</p>
+            <p class="text-xl"><strong>ชื่อโครงงาน:</strong> ระบบแนะนำที่พักสำหรับนักท่องเที่ยว</p>
+            <p class="text-xl"><strong>วันที่นัดหมาย:</strong> 25 ตุลาคม 2568</p>
+            <p class="text-xl"><strong>เวลา:</strong> 13:00 น.</p>
+            <p class="text-xl"><strong>ห้องสอบ:</strong> BA-201</p>
+            <p class="text-xl"><strong>กรรมการสอบ:</strong></p>
+            <ul class="list-disc list-inside ml-6 text-lg">
+                <li>อาจารย์ A</li>
+                <li>อาจารย์ B</li>
+                <li>อาจารย์ C</li>
+            </ul>
+            <p class="text-lg text-red-600">
+                <strong>หมายเหตุ:</strong>
+                มีการเลื่อนนัดหมายจากเวลาเดิม 10:00 น. เนื่องจากห้องประชุมไม่ว่าง
+            </p>
+        </div>
+    </div>
+</div>
+
+
+    </main>
+
+    <div id="proposalModal" class="modal">
+        <div class="modal-content-card">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-bold text-blue-800">เสนอหัวข้อโครงงาน</h3>
+                <button onclick="closeModal('proposalModal')"
+                    class="text-gray-500 hover:text-gray-700 text-3xl">&times;</button>
+            </div>
+
+            <form class="space-y-4">
+                <div>
+                    <label for="thaiName" class="block text-gray-700 font-semibold mb-1">ชื่อโครงงาน (ภาษาไทย):</label>
+                    <input type="text" id="thaiName"
+                        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="engName" class="block text-gray-700 font-semibold mb-1">ชื่อโครงงาน
+                        (ภาษาอังกฤษ):</label>
+                    <input type="text" id="engName"
+                        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="proposalTopic" class="block text-gray-700 font-semibold mb-1">เสนอหัวข้อโครงงาน:</label>
+                    <input type="text" id="proposalTopic"
+                        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="scope" class="block text-gray-700 font-semibold mb-1">ขอบเขต:</label>
+                    <input type="text" id="scope"
+                        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="advisor" class="block text-gray-700 font-semibold mb-1">อาจารย์ที่ปรึกษา:</label>
+                    <select id="advisor"
+                        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">-- เลือกอาจารย์ที่ปรึกษา --</option>
+                        <option value="advisor1">อาจารย์ A</option>
+                        <option value="advisor2">อาจารย์ B</option>
+                        <option value="advisor3">อาจารย์ C</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="coAdvisor" class="block text-gray-700 font-semibold mb-1">อาจารย์ที่ปรึกษาร่วม
+                        (ถ้ามี):</label>
+                    <select id="coAdvisor"
+                        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">-- เลือกอาจารย์ที่ปรึกษาร่วม --</option>
+                        <option value="coAdvisor1">อาจารย์ D</option>
+                        <option value="coAdvisor2">อาจารย์ E</option>
+                        <option value="coAdvisor3">อาจารย์ F</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="proposalFile"
+                        class="block text-gray-700 font-semibold mb-1">แนบไฟล์เอกสารยื่นหัวข้อโครงงาน:</label>
+                    <input type="file" id="proposalFile"
+                        class="w-full text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+                </div>
+
+                <div class="flex space-x-4 mt-6">
+                    <button type="button" onclick="submitProposal()"
+                        class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-md transition-colors duration-200">
+                        ยืนยัน
+                    </button>
+                    <button type="button" onclick="closeModal('proposalModal')"
+                        class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 rounded-md transition-colors duration-200">
+                        ยกเลิก
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="submissionAlert" class="modal">
+        <div class="alert-modal-card">
+            <svg id="successIcon" class="mx-auto text-green-500 w-16 h-16 mb-4" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+
+            <h3 id="alertTitle" class="text-2xl font-bold text-gray-800 mb-2">เสนอหัวข้อโครงงาน สำเร็จ</h3>
+            <p id="alertMessage" class="text-gray-600">กรุณารอผลการตรวจสอบ</p>
+
+            <button onclick="closeModal('submissionAlert')"
+                class="mt-6 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-md transition-colors duration-200">
+                OK
+            </button>
+        </div>
+    </div>
+
+    
+<script src="main_student.js"></script>
+</body>
+
+</html>

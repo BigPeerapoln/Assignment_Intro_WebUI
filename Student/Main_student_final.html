@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หน้าหลักนักศึกษา</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .progress-bar {
+            transition: width 1s ease-in-out;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            box-sizing: border-box;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            /* สีพื้นหลังทึบแสง */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            /* ให้ modal แสดงอยู่บนสุด */
+        }
+
+        /* คุณอาจจะต้องการปรับสไตล์ alert-modal-card เพิ่มเติมเพื่อให้มีขอบโค้งและเงาที่สวยงามขึ้น */
+        .alert-modal-card {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            /* ทำให้ขอบโค้งมนขึ้น */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            /* เพิ่มเงาให้ดูมีมิติ */
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        /* เพิ่ม animation เพื่อให้การแสดงผลดูดีขึ้น */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-content-card {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            max-width: 600px;
+            width: 100%;
+            margin: auto;
+            margin-top: 50px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .alert-modal-card {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #ef4444;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .dashboard-menu-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            cursor: pointer;
+        }
+
+        .dashboard-menu-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen">
+
+    <header class="bg-blue-800 shadow-md p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold text-white">ระบบยื่นสอบโครงงานพิเศษ และโครงงานสหกิจ</h1>
+            <div class="flex items-center space-x-4">
+                <span class="text-white font-semibold">กัณติกรณ์</span>
+                <div class="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                    <img src="../img_system/student.jpg" alt="Student Profile" class="object-cover w-full h-full">
+                </div> 
+                <a href="#" id="logoutTrigger" class="text-white hover:text-gray-300 transition duration-300">
+                    <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto p-8">
+
+        <div class="text-center mb-6">
+            <h1 class="text-4xl font-bold text-gray-800">แดชบอร์ดนักศึกษา</h1>
+            <p class="text-lg text-gray-600 mt-2">ภาพรวมและเมนูหลักสำหรับจัดการโครงงาน</p>
+        </div>
+
+        <div id="trackingStatusCard"
+            class="bg-blue-500 p-6 rounded-lg shadow-md flex flex-col items-center justify-center text-white mb-8">
+            <h2 class="text-2xl font-bold mb-4">สถานะการติดตาม</h2>
+            <p class="text-lg font-medium">ความคืบหน้าของโครงงาน</p>
+            <div class="w-full bg-blue-200 rounded-full h-4 mt-2 mb-2">
+                <div id="progressBar" class="bg-blue-800 h-4 rounded-full progress-bar" style="width: 0%;"></div>
+            </div>
+            <p id="progressText" class="text-xl font-bold text-white">0%</p>
+            <button onclick="showProgressModal()"
+                class="bg-white text-blue-800 font-bold py-2 px-6 rounded-md hover:bg-gray-100 transition-colors duration-200 mt-4">
+                เพิ่มความคืบหน้ารายสัปดาห์ สำหรับ นศ
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <a href="#" onclick="showProposalForm()"
+                class="dashboard-menu-card block bg-white rounded-lg shadow-md p-6 text-center">
+                <div class="mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-500 mx-auto" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="12" y1="18" x2="12" y2="12"></line>
+                        <line x1="9" y1="15" x2="15" y2="15"></line>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-800">เสนอหัวข้อโครงงาน</h2>
+            </a>
+
+            <a href="#" onclick="showStatusPage()"
+                class="dashboard-menu-card block bg-white rounded-lg shadow-md p-6 text-center">
+                <div class="mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-green-500 mx-auto" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-8.6"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-800">ติดตามสถานะการอนุมัติขึ้นสอบหัวข้อ</h2>
+            </a>
+
+            <a href="#" onclick="showNotificationDetails()"
+                class="dashboard-menu-card relative block bg-white rounded-lg shadow-md p-6 text-center">
+                <span id="notificationBadge" class="notification-badge hidden"></span>
+                <div class="mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-yellow-500 mx-auto"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-800">รายละเอียดเวลา นัดหมายการสอบขึ้นสอบหัวข้อ</h2>
+            </a>
+
+            <a href="Check_status_success.html"
+                class="dashboard-menu-card block bg-white rounded-lg shadow-md p-6 text-center">
+                <div class="mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-purple-500 mx-auto"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <line x1="10" y1="9" x2="8" y2="9"></line>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-800">ตรวจสอบผลการสอบหัวข้อ</h2>
+            </a>
+
+            <a href="Progress_report.html"
+                class="dashboard-menu-card block bg-white rounded-lg shadow-md p-6 text-center">
+                <div class="mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-orange-500 mx-auto"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                        <path d="M12 16h.01"></path>
+                        <path d="M12 12h.01"></path>
+                        <path d="M8 12h.01"></path>
+                        <path d="M8 16h.01"></path>
+                        <path d="M16 12h.01"></path>
+                        <path d="M16 16h.01"></path>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-800">ตรวจสอบข้อมูลความคืบหน้าย้อนหลัง</h2>
+            </a>
+
+            <div id="finalExamCardPlaceholder"></div>
+
+            <a href="final_check_state.html"
+                class="dashboard-menu-card block bg-white rounded-lg shadow-md p-6 text-center">
+                <div class="mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-500 mx-auto" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-800">ติดตามสถานะการขึ้นสอบโครงงานจบ</h2>
+            </a>
+
+            <a href="Check_final_project_success.html"
+                class="dashboard-menu-card block bg-white rounded-lg shadow-md p-6 text-center">
+                <div class="mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-red-500 mx-auto" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <circle cx="12" cy="15" r="4"></circle>
+                        <path d="M15 11l-3 4-2-2"></path>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-800">ตรวจสอบผลการขึ้นสอบโครงงาน</h2>
+            </a>
+
+        </div>
+    </main>
+
+    <div id="statusModal" class="modal">
+        <div class="modal-content-card">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-bold text-blue-800">สถานะการอนุมัติขึ้นสอบหัวข้อ</h3>
+                <button onclick="closeModal('statusModal')"
+                    class="text-gray-500 hover:text-gray-700 text-3xl">&times;</button>
+            </div>
+            <div class="flex flex-col md:flex-row items-center justify-between relative space-y-8 md:space-y-0">
+                <div class="absolute top-1/2 left-0 w-full transform -translate-y-1/2 hidden md:block">
+                    <div class="h-1 bg-gray-300 w-full"></div>
+                    <div id="progressLine"
+                        class="h-1 bg-green-500 absolute top-0 left-0 transition-all duration-500 ease-in-out"
+                        style="width: 0%;"></div>
+                </div>
+                <div class="flex flex-col items-center z-10 w-full md:w-1/3">
+                    <div class="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center mb-2">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <p class="text-sm font-semibold text-center text-gray-800">ยื่นเสนอหัวข้อโครงงาน</p>
+                </div>
+                <div class="flex flex-col items-center z-10 w-full md:w-1/3">
+                    <div id="step2Icon"
+                        class="w-10 h-10 rounded-full bg-gray-400 text-white flex items-center justify-center mb-2">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM5 10a5 5 0 1110 0 5 5 0 01-10 0z"></path>
+                        </svg>
+                    </div>
+                    <p id="step2Text" class="text-sm font-semibold text-center text-gray-600">รอผู้ดูแลระบบอนุมัติ</p>
+                </div>
+                <div class="flex flex-col items-center z-10 w-full md:w-1/3">
+                    <div id="step3Icon"
+                        class="w-10 h-10 rounded-full bg-gray-400 text-white flex items-center justify-center mb-2">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM5 10a5 5 0 1110 0 5 5 0 01-10 0z"></path>
+                        </svg>
+                    </div>
+                    <p id="step3Text" class="text-sm font-semibold text-center text-gray-600">อนุมัติการขึ้นสอบ
+                        หัวข้อโครงงาน</p>
+                </div>
+            </div>
+            <div class="text-center mt-8">
+                <p class="text-center text-gray-500 text-sm mb-4">สถานะการตรวจสอบล่าสุด ณ วันที่ 13 กันยายน 2568</p>
+                <button id="viewDetailsBtn" onclick="showNotificationDetails()"
+                    class="hidden bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-md transition-colors duration-200">
+                    ดูรายละเอียดและเวลานัดหมาย
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="notificationModal" class="modal">
+        <div class="modal-content-card">
+            <div
+                class="bg-gradient-to-r from-blue-700 to-blue-900 text-white px-6 py-5 flex justify-between items-center shadow-md">
+                <h2 class="text-2xl font-bold drop-shadow-lg">รายละเอียดการสอบหัวข้อโครงงาน</h2>
+                <button onclick="closeModal('notificationModal')"
+                    class="text-white hover:text-gray-200 text-3xl font-bold focus:outline-none">
+                    &times;
+                </button>
+            </div>
+            <div class="p-8 space-y-4">
+                <p class="text-xl"><strong>สถานะ:</strong> <span
+                        class="text-green-600 font-bold">อนุมัติให้ขึ้นสอบหัวข้อโครงงาน</span></p>
+                <p class="text-xl"><strong>อนุมัติเมื่อ:</strong> 13 กันยายน 2568</p>
+                <p class="text-xl"><strong>ชื่อโครงงาน:</strong> ระบบแนะนำที่พักสำหรับนักท่องเที่ยว</p>
+                <p class="text-xl"><strong>วันที่นัดหมาย:</strong> 25 ตุลาคม 2568</p>
+                <p class="text-xl"><strong>เวลา:</strong> 13:00 น.</p>
+                <p class="text-xl"><strong>ห้องสอบ:</strong> BA-201</p>
+                <p class="text-xl"><strong>กรรมการสอบ:</strong></p>
+                <ul class="list-disc list-inside ml-6 text-lg space-y-1">
+                    <li>รศ.ดร.อนิราช มิ่งขวัญ</li>
+                    <li>ผศ.ดร.นิติการ นาคเจือทอง</li>
+                    <li>ผศ.ดร.วันทนี ประจวบศุภกิจ</li>
+                </ul>
+                <p class="text-lg text-red-600"><strong>หมายเหตุ:</strong> มีการเลื่อนนัดหมายจากเวลาเดิม 10:00 น.
+                    เนื่องจากห้องประชุมไม่ว่าง</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="proposalModal" class="modal">
+        <div class="modal-content-card">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-bold text-blue-800">เสนอหัวข้อโครงงาน</h3>
+                <button onclick="closeModal('proposalModal')"
+                    class="text-gray-500 hover:text-gray-700 text-3xl">&times;</button>
+            </div>
+            <form class="space-y-4">
+                <div>
+                    <label for="thaiName" class="block text-gray-700 font-semibold mb-1">ชื่อโครงงาน (ภาษาไทย):</label>
+                    <input type="text" id="thaiName" placeholder="โปรดชื่อโครงงานภาษาไทย....."
+                        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="engName" class="block text-gray-700 font-semibold mb-1">ชื่อโครงงาน
+                        (ภาษาอังกฤษ):</label>
+                    <input type="text" id="engName" placeholder="โปรดชื่อโครงงานภาษาอังกฤษ....."
+                        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="proposalTopic" class="block text-gray-700 font-semibold mb-1">เสนอหัวข้อโครงงาน:</label>
+                    <input type="text" id="proposalTopic" placeholder="เสนอหัวข้อโครงงาน"
+                        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="scope" class="block text-gray-700 font-semibold mb-1">ขอบเขต:</label>
+                    <input type="text" id="scope" placeholder="กรอกขอบเขตของโครงงาน...."
+                        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="advisor" class="block text-gray-700 font-semibold mb-1">อาจารย์ที่ปรึกษา:</label>
+                    <select id="advisor"
+                        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">-- เลือกอาจารย์ที่ปรึกษา --</option>
+                        <option value="advisor1">รศ.ดร.อนิราช มิ่งขวัญ</option>
+                        <option value="advisor2">ผศ.อรบุษป์ วุฒิกมลชัย</option>
+                        <option value="advisor3">ผศ.ดร.บีสุดา ดาวเรือง</option>
+                        <option value="advisor4">ผศ.ดร.ขนิษฐา นามี</option>
+                        <option value="advisor5">อ.ดร.กาญจน ณ ศรีธะ</option>
+                        <option value="advisor6">ผศ.นพดล บูรณ์กุศล</option>
+                        <option value="advisor7">ผศ.จสต.นพเก้า ทองใบ</option>
+                        <option value="advisor8">ผศ.ดร.นิติการ นาคเจือทอง</option>
+                        <option value="advisor9">ผศ.ดร.นัฎฐพันธ์ นาคพงษ์</option>
+                        <option value="advisor10">ผศ.นิมิต ศรีคำทา</option>
+                        <option value="advisor11">อ.ดร.พิทย์พิมล ชูรอด</option>
+                        <option value="advisor12">ผศ.ดร.พาฝัน ดวงไพศาล</option>
+                        <option value="advisor13">อ.ดร.ประดิษฐ์ พิทักษ์เสถียรกุล</option>
+                        <option value="advisor14">ผศ.พีระศักดิ์ เสรีกุล</option>
+                        <option value="advisor15">ผศ.สมชัย เชียงพงศ์พันธุ์</option>
+                        <option value="advisor16">ผศ.ดร.สุปีติ กุลจันทร์</option>
+                        <option value="advisor17">ผศ.สิวาลัย จินเจือ</option>
+                        <option value="advisor18">ผศ.ดร.สุพาภรณ์ ซิ้มเจริญ</option>
+                        <option value="advisor19">ผศ.ดร.ศรายุทธ ธเนศสกุลวัฒนา</option>
+                        <option value="advisor20">อ.ดร.ศิรินทรา แว่วศรี</option>
+                        <option value="advisor21">อ.ดร.วัชรชัย คงศิริวัฒนา</option>
+                        <option value="advisor22">ผศ.ดร.วันทนี ประจวบศุภกิจ</option>
+                        <option value="advisor23">รศ.ดร.ยุพิน สรรพคุณ</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="coAdvisor" class="block text-gray-700 font-semibold mb-1">อาจารย์ที่ปรึกษาร่วม
+                        (ถ้ามี):</label>
+                    <select id="coAdvisor"
+                        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">-- เลือกอาจารย์ที่ปรึกษาร่วม --</option>
+                        <option value="coAdvisor1">รศ.ดร.อนิราช มิ่งขวัญ</option>
+                        <option value="coAdvisor2">ผศ.อรบุษป์ วุฒิกมลชัย</option>
+                        <option value="coAdvisor3">ผศ.ดร.บีสุดา ดาวเรือง</option>
+                        <option value="coAdvisor4">ผศ.ดร.ขนิษฐา นามี</option>
+                        <option value="coAdvisor5">อ.ดร.กาญจน ณ ศรีธะ</option>
+                        <option value="coAdvisor6">ผศ.นพดล บูรณ์กุศล</option>
+                        <option value="coAdvisor7">ผศ.จสต.นพเก้า ทองใบ</option>
+                        <option value="coAdvisor8">ผศ.ดร.นิติการ นาคเจือทอง</option>
+                        <option value="coAdvisor9">ผศ.ดร.นัฎฐพันธ์ นาคพงษ์</option>
+                        <option value="coAdvisor10">ผศ.นิมิต ศรีคำทา</option>
+                        <option value="coAdvisor11">อ.ดร.พิทย์พิมล ชูรอด</option>
+                        <option value="coAdvisor12">ผศ.ดร.พาฝัน ดวงไพศาล</option>
+                        <option value="coAdvisor13">อ.ดร.ประดิษฐ์ พิทักษ์เสถียรกุล</option>
+                        <option value="coAdvisor14">ผศ.พีระศักดิ์ เสรีกุล</option>
+                        <option value="coAdvisor15">ผศ.สมชัย เชียงพงศ์พันธุ์</option>
+                        <option value="coAdvisor16">ผศ.ดร.สุปีติ กุลจันทร์</option>
+                        <option value="coAdvisor17">ผศ.สิวาลัย จินเจือ</option>
+                        <option value="coAdvisor18">ผศ.ดร.สุพาภรณ์ ซิ้มเจริญ</option>
+                        <option value="coAdvisor19">ผศ.ดร.ศรายุทธ ธเนศสกุลวัฒนา</option>
+                        <option value="coAdvisor20">อ.ดร.ศิรินทรา แว่วศรี</option>
+                        <option value="coAdvisor21">อ.ดร.วัชรชัย คงศิริวัฒนา</option>
+                        <option value="coAdvisor22">ผศ.ดร.วันทนี ประจวบศุภกิจ</option>
+                        <option value="coAdvisor23">รศ.ดร.ยุพิน สรรพคุณ</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="proposalFile"
+                        class="block text-gray-700 font-semibold mb-1">แนบไฟล์เอกสารยื่นหัวข้อโครงงาน:</label>
+                    <input type="file" id="proposalFile"
+                        class="w-full text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+                </div>
+                <div class="flex space-x-4 mt-6">
+                    <button type="button" onclick="submitProposal()"
+                        class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-md transition-colors duration-200">
+                        ยืนยัน
+                    </button>
+                    <button type="button" onclick="closeModal('proposalModal')"
+                        class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 rounded-md transition-colors duration-200">
+                        ยกเลิก
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="progressModal" class="modal">
+        <div class="modal-content-card">
+            <div
+                class="bg-gradient-to-r from-blue-700 to-blue-900 text-white px-6 py-5 flex justify-between items-center shadow-md">
+                <h2 class="text-2xl font-bold drop-shadow-lg">เพิ่มความคืบหน้ารายสัปดาห์</h2>
+                <button onclick="closeModal('progressModal')"
+                    class="text-white hover:text-gray-200 text-3xl font-bold focus:outline-none">
+                    &times;
+                </button>
+            </div>
+            <form class="p-8 space-y-6">
+                <div>
+                    <label for="progressDetail"
+                        class="block text-gray-700 font-semibold mb-1">รายละเอียดความคืบหน้า:</label>
+                    <textarea id="progressDetail"
+                        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        rows="5" placeholder="สรุปรายละเอียดความคืบหน้าของโครงงานในสัปดาห์นี้"></textarea>
+                </div>
+                <div>
+                    <label for="documentFile" class="block text-gray-700 font-semibold mb-1">แนบไฟล์เอกสาร:</label>
+                    <input type="file" id="documentFile"
+                        class="w-full text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+                </div>
+                <div>
+                    <label for="documentLink" class="block text-gray-700 font-semibold mb-1">แนบไฟล์ลิงก์ (Google
+                        Drive/GitHub):</label>
+                    <input type="url" id="documentLink"
+                        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="ตัวอย่าง: https://drive.google.com/folder">
+                </div>
+                <div class="flex space-x-4 mt-6">
+                    <button type="button" onclick="submitProgress()"
+                        class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-md transition-colors duration-200">
+                        ยืนยัน
+                    </button>
+                    <button type="button" onclick="closeModal('progressModal')"
+                        class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 rounded-md transition-colors duration-200">
+                        ยกเลิก
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="finalExamModal" class="modal">
+        <div class="modal-content-card">
+            <div
+                class="bg-gradient-to-r from-green-600 to-green-800 text-white px-6 py-5 flex justify-between items-center shadow-md">
+                <h2 class="text-2xl font-bold drop-shadow-lg">ยื่นสอบโครงงานจบ</h2>
+                <button onclick="closeModal('finalExamModal')"
+                    class="text-white hover:text-gray-200 text-3xl font-bold focus:outline-none">
+                    &times;
+                </button>
+            </div>
+            <form class="p-8 space-y-6">
+                <div>
+                    <label for="projectFile" class="block text-gray-700 font-semibold mb-1">ไฟล์เล่มโครงงาน
+                        (PDF):</label>
+                    <input type="file" id="projectFile" accept=".pdf"
+                        class="w-full text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer">
+                </div>
+                <div>
+                    <label for="presentationFile" class="block text-gray-700 font-semibold mb-1">ไฟล์
+                        Presentation:</label>
+                    <input type="file" id="presentationFile" accept=".ppt,.pptx"
+                        class="w-full text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer">
+                </div>
+                <div>
+                    <label for="sourceCodeLink" class="block text-gray-700 font-semibold mb-1">แนบไฟล์โค้ดสมบูรณ์ หรือ
+                        ลิงก์ (Google Drive/GitHub):</label>
+                    <input type="url" id="sourceCodeLink"
+                        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder="ตัวอย่าง: https://github.com/your-project">
+                </div>
+                <div class="flex space-x-4 mt-6">
+                    <button type="button" onclick="submitFinalExam()"
+                        class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 rounded-md transition-colors duration-200">
+                        ยืนยันการยื่นสอบ
+                    </button>
+                    <button type="button" onclick="closeModal('finalExamModal')"
+                        class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 rounded-md transition-colors duration-200">
+                        ยกเลิก
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <div id="submissionAlert" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40 hidden">
+        <div class="alert-modal-card">
+            <svg id="successIcon" class="mx-auto text-green-500 w-16 h-16 mb-4" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h3 id="alertTitle" class="text-2xl font-bold text-gray-800 mb-2">เสนอหัวข้อโครงงาน สำเร็จ</h3>
+            <p id="alertMessage" class="text-gray-600">กรุณารอผลการตรวจสอบ</p>
+            <button onclick="closeModal('submissionAlert')"
+                class="mt-6 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-md transition-colors duration-200">
+                OK
+            </button>
+        </div>
+    </div>
+
+    <div id="finalExamAlert" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40 hidden">
+        <div class="alert-modal-card">
+            <svg id="finalSuccessIcon" class="mx-auto text-green-500 w-16 h-16 mb-4" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h3 id="finalAlertTitle" class="text-2xl font-bold text-gray-800 mb-2">ยื่นสอบจบโครงงานสำเร็จ</h3>
+            <p id="finalAlertMessage" class="text-gray-600">โปรดติดตามสถานะต่อไป เพื่อขึ้นสอบ</p>
+            <a href="final_check_state.html"
+                class="mt-6 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-md transition-colors duration-200 text-center inline-block">
+                OK
+            </a>
+        </div>
+    </div>
+
+
+    <footer class="bg-gradient-to-r from-blue-800 to-blue-900 text-white py-4 mt-auto shadow-lg">
+        <div
+            class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-center md:text-left space-y-2 md:space-y-0">
+            <div class="flex items-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-300" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+                <p class="font-bold text-sm md:text-base">ระบบยื่นสอบโครงงานพิเศษและโครงงานสหกิจ</p>
+                <span class="hidden md:inline text-blue-200 text-xs md:text-sm">|</span>
+                <p class="text-blue-200 text-xs md:text-sm">ภาควิชาเทคโนโลยีสารสนเทศ มจพ. วิทยาเขตปราจีน</p>
+            </div>
+
+            <div class="text-xs md:text-sm text-center md:text-right">
+                <p class="font-semibold text-blue-100">จัดทำโดย: นายกัณติกรณ์ สรสุริยวงษ์ และ นายพีรพล บัวขยาย</p>
+            </div>
+        </div>
+
+        <hr class="border-blue-700 my-2 opacity-70">
+
+        <p class="text-center text-xs text-blue-300">
+            &copy; 2025 King Mongkut's University of Technology North Bangkok. All Rights Reserved.
+        </p>
+    </footer>
+
+
+    <div id="logoutAlert" class="modal hidden">
+        <div class="alert-modal-card">
+            <div class="flex flex-col items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-red-500 mx-auto mb-4" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                    </path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">ยืนยันการออกจากระบบ</h3>
+                <p class="text-gray-600 mb-6">คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?</p>
+                <div class="flex space-x-4 w-full">
+                    <button onclick="confirmLogout()"
+                        class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-md transition-colors duration-200">
+                        ยืนยัน
+                    </button>
+                    <button onclick="closeModal('logoutAlert')"
+                        class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 rounded-md transition-colors duration-200">
+                        ยกเลิก
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+            // Function to show the modal (ไม่จำเป็นต้องเปลี่ยน)
+    function showModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.remove('hidden');
+            // เนื่องจาก modal มี class .modal อยู่แล้ว ซึ่ง CSS กำหนด display: none; 
+            // เราอาจจะต้องกำหนดให้มันแสดงผลเป็น flex หรือ block ตามที่ต้องการ
+            modal.style.display = 'flex'; // เพิ่มบรรทัดนี้เพื่อบังคับให้แสดงผล
+        }
+    }
+
+    // Function to close the modal (มีการปรับปรุงเล็กน้อยเพื่อให้สอดคล้องกับ showModal)
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'none';
+            modal.classList.add('hidden'); 
+        }
+    }
+
+    // Function to handle the logout confirmation
+    function confirmLogout() {
+        window.location.href = '../index.html';
+    }
+
+    // *** ส่วนที่สำคัญที่สุด: ห่อโค้ดดักจับการคลิก ***
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. ระบุลิงก์ด้วย ID
+        const logoutLink = document.getElementById('logoutTrigger');
+        
+        // 2. ดักจับการคลิก
+        if (logoutLink) {
+            logoutLink.addEventListener('click', function (event) {
+                // ป้องกันไม่ให้ลิงก์ # กระโดดขึ้นบนสุดของหน้า
+                event.preventDefault(); 
+                // แสดง Modal
+                showModal('logoutAlert');
+            });
+        }
+    });
+    </script>
+  
+   
+</body>
+
+</html>
+
+<script src="Main_student_final.js"></script>

@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แดชบอร์ดประเมินผลโครงงาน</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content-card {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            max-width: 800px;
+            width: 90%;
+            position: relative;
+            transform: scale(0.95);
+            opacity: 0;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .modal.is-active .modal-content-card {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .modal-header {
+            background-color: #1e3a8a;
+            color: white;
+            padding: 1.5rem 2rem;
+            border-top-left-radius: 0.75rem;
+            border-top-right-radius: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: -2rem -2rem 2rem -2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .new-evaluation-modal-content {
+            max-width: 600px;
+            padding: 0;
+        }
+
+        .new-evaluation-modal-content .modal-header {
+            margin: 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .new-evaluation-modal-body {
+            padding: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .section-header::before {
+            content: '';
+            display: block;
+            width: 8px;
+            height: 24px;
+            background-color: #2563eb;
+            margin-right: 0.75rem;
+            border-radius: 2px;
+        }
+
+        .radio-option {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.75rem 1.25rem;
+            border-radius: 9999px;
+            border: 1px solid #d1d5db;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-weight: 500;
+            color: #4b5563;
+        }
+
+        .radio-option:hover {
+            background-color: #eff6ff;
+            border-color: #93c5fd;
+        }
+
+        .radio-option input[type="radio"] {
+            display: none;
+        }
+
+        .radio-option span.custom-radio {
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid #9ca3af;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.5rem;
+            position: relative;
+        }
+
+        .radio-option input[type="radio"]:checked+span.custom-radio {
+            border-color: #2563eb;
+        }
+
+        .radio-option input[type="radio"]:checked+span.custom-radio::after {
+            content: '';
+            width: 0.5rem;
+            height: 0.5rem;
+            background-color: #2563eb;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #pass-complete:checked+.radio-option {
+            background-color: #d1fae5;
+            border-color: #34d399;
+            color: #065f46;
+        }
+
+        #pass-with-revision:checked+.radio-option {
+            background-color: #fffbeb;
+            border-color: #fcd34d;
+            color: #b45309;
+        }
+
+        #fail:checked+.radio-option {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+
+        .chart-card {
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 flex flex-col min-h-screen">
+
+    <header class="bg-blue-900 text-white shadow-lg py-6 px-8">
+        <div class="container mx-auto flex justify-between items-center">
+            <button id="sidebar-open-btn" class="lg:hidden p-2 text-white focus:outline-none">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7">
+                    </path>
+                </svg>
+            </button>
+            <h1 class="text-3xl font-bold">ระบบจัดการโครงงานพิเศษและโครงงานสหกิจ</h1>
+            <div class="flex items-center space-x-4">
+                <span class="text-lg font-medium">สวัสดี: ผศ.ดร.นิติการ นาคเจือทอง</span>
+                <a href="#" class="text-white hover:text-gray-300 transition duration-300">
+                    <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 flex-grow">
+
+        <aside id="sidebar"
+            class="sidebar lg:relative fixed top-0 left-0 h-full overflow-y-auto z-30 lg:block lg:p-4 bg-white shadow-md flex-grow min-h-screen col-span-2 w-[280px]">
+            <div
+                class="p-4 bg-indigo-700 text-white flex items-center justify-between lg:justify-start lg:rounded-t-lg lg:hidden">
+                <h3 class="text-xl font-bold">เมนู</h3>
+                <button id="sidebar-close-btn" class="lg:hidden text-white text-2xl">&times;</button>
+            </div>
+            <nav class="bg-white lg:rounded-b-lg">
+                <ul class="space-y-2">
+                    <a href="dashbroad_director.html"
+                        class="flex items-center p-3 text-white bg-indigo-600 rounded-md transition-colors w-64">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-white" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1" />
+                        </svg>
+                        กลับหน้าหลัก
+                    </a>
+                    <li>
+                        <a href="exam_topics_table.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 7.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zM7.5 10a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5zM7.5 12.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" />
+                            </svg>
+                            ตารางการสอบหัวข้อโครงงาน
+                        </a>
+                    </li>
+                    <li>
+                        <a href="Evaluation_toppic.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 7.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zM7.5 10a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5zM7.5 12.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" />
+                            </svg>
+                            ประเมินผลสอบหัวข้อโครงงาน
+                        </a>
+                    </li>
+                    <li>
+                        <a href="status_topic.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M9 2a1 1 0 00-1 1v2a1 1 0 002 0V3a1 1 0 00-1-1zM5.553 4.847a1 1 0 00-1.414 1.414l1.414 1.414a1 1 0 101.414-1.414L5.553 4.847zM3 9a1 1 0 000 2h2a1 1 0 100-2H3zM4.847 14.447a1 1 0 00-1.414-1.414l-1.414 1.414a1 1 0 101.414 1.414l1.414-1.414zM9 17a1 1 0 00-1 1v2a1 1 0 102 0v-2a1 1 0 00-1-1zM14.447 19.153a1 1 0 001.414-1.414l-1.414-1.414a1 1 0 00-1.414 1.414l1.414 1.414zM17 10a1 1 0 000-2h2a1 1 0 100 2h-2zM19.153 14.447a1 1 0 00-1.414 1.414l1.414 1.414a1 1 0 001.414-1.414l-1.414-1.414z" />
+                            </svg>
+                            ติดตามสถานะโครงงาน
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="schedule_final.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M2 4a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V4zm2-2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4z"
+                                    clip-rule="evenodd" fill-rule="evenodd" />
+                                <path fill-rule="evenodd"
+                                    d="M7 6a1 1 0 00-1 1v8a1 1 0 102 0V7a1 1 0 00-1-1zM10 6a1 1 0 00-1 1v6a1 1 0 102 0V7a1 1 0 00-1-1zM13 6a1 1 0 00-1 1v4a1 1 0 102 0V7a1 1 0 00-1-1z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            ตารางการสอบจบโครงงาน
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="Evaluation_final_Test.html"
+                            class="flex items-center p-3 text-white bg-indigo-600 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-white" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-8a1 1 0 10-2 0v4a1 1 0 102 0v-4zm5-4a1 1 0 00-1-1H7a1 1 0 00-1 1v2a1 1 0 001 1h6a1 1 0 001-1V6z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            ประเมินผลขึ้นสอบโครงงานจบ
+                        </a>
+                    </li>
+
+
+                    <li>
+                        <a href="Sign_off_project.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M2 4a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V4zm2-2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4z"
+                                    clip-rule="evenodd" fill-rule="evenodd" />
+                                <path fill-rule="evenodd"
+                                    d="M7 6a1 1 0 00-1 1v8a1 1 0 102 0V7a1 1 0 00-1-1zM10 6a1 1 0 00-1 1v6a1 1 0 102 0V7a1 1 0 00-1-1zM13 6a1 1 0 00-1 1v4a1 1 0 102 0V7a1 1 0 00-1-1z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            ลงนามเอกสารโครงงานจบ
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="flex-grow p-8 col-span-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="stat-card bg-white rounded-xl shadow-lg p-6 flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 font-medium">โครงงานทั้งหมด</p>
+                        <p id="totalProjects" class="text-4xl font-extrabold text-blue-600 mt-1">0</p>
+                    </div>
+                    <div class="bg-blue-100 text-blue-500 p-4 rounded-full">
+                        <i class="fas fa-list-ul fa-2x"></i>
+                    </div>
+                </div>
+
+                <div class="stat-card bg-white rounded-xl shadow-lg p-6 flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 font-medium">รอประเมิน</p>
+                        <p id="pendingCount" class="text-4xl font-extrabold text-yellow-600 mt-1">0</p>
+                    </div>
+                    <div class="bg-yellow-100 text-yellow-500 p-4 rounded-full">
+                        <i class="fas fa-hourglass-half fa-2x"></i>
+                    </div>
+                </div>
+
+                <div class="stat-card bg-white rounded-xl shadow-lg p-6 flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 font-medium">ประเมินแล้ว</p>
+                        <p id="evaluatedCount" class="text-4xl font-extrabold text-green-600 mt-1">0</p>
+                    </div>
+                    <div class="bg-green-100 text-green-500 p-4 rounded-full">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                </div>
+
+                <div class="stat-card bg-white rounded-xl shadow-lg p-6 flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 font-medium">ทั้งหมด</p>
+                        <p id="allCount" class="text-4xl font-extrabold text-gray-800 mt-1">0</p>
+                    </div>
+                    <div class="bg-gray-100 text-gray-500 p-4 rounded-full">
+                        <i class="fas fa-project-diagram fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-lg p-6 chart-card">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">สถานะการประเมิน</h2>
+                    <canvas id="evaluationStatusChart"></canvas>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 chart-card">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">ผลการประเมิน</h2>
+                    <canvas id="evaluationResultChart"></canvas>
+                </div>
+            </div>
+
+            <div class="w-full bg-white rounded-xl shadow-2xl p-6">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+                    <h1 class="text-3xl font-bold text-gray-800">รายการโครงงาน</h1>
+                    <div class="flex items-center space-x-2 mt-4 md:mt-0">
+                        <label for="statusFilter" class="text-gray-700 font-medium">เลือกสถานะ:</label>
+                        <select id="statusFilter"
+                            class="p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+                            <option value="ทั้งหมด">ทั้งหมด</option>
+                            <option value="รอประเมิน">รอประเมิน</option>
+                            <option value="ประเมินแล้ว">ประเมินแล้ว</option>
+                            <option value="ผ่านสมบูรณ์">ผ่านสมบูรณ์</option>
+                            <option value="ผ่านแบบแก้ไข">ผ่านแบบแก้ไข</option>
+                            <option value="ไม่ผ่าน">ไม่ผ่าน</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="projectCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="evaluationModal" class="modal">
+        <div class="modal-content-card new-evaluation-modal-content">
+            <div class="modal-header">
+                <h3 class="text-2xl font-bold">ประเมินผลการสอบโครงงาน</h3>
+                <button onclick="closeEvaluationModal()"
+                    class="text-white hover:text-gray-300 transition-colors duration-200 text-3xl font-light">&times;</button>
+            </div>
+            <div class="new-evaluation-modal-body">
+                <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <div class="section-header">
+                        <h4 class="text-xl font-bold text-gray-800">ข้อมูลโครงงาน</h4>
+                    </div>
+                    <p class="mb-2"><strong>ชื่อโครงงาน:</strong> <span id="evalProjectName"></span></p>
+                    <div id="evalMembers" class="space-y-1 pl-4 mb-2"></div>
+                    <p><strong>อาจารย์ที่ปรึกษา:</strong> <span id="evalAdvisor"></span></p>
+                </div>
+                <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <div class="section-header">
+                        <h4 class="text-xl font-bold text-gray-800">สถานะการประเมิน</h4>
+                    </div>
+                    <div class="flex flex-wrap gap-4 mt-2">
+                        <label for="pass-complete">
+                            <input type="radio" id="pass-complete" name="evaluation" value="ผ่านสมบูรณ์"
+                                onchange="toggleCommentArea()">
+                            <span class="radio-option">
+                                <span class="custom-radio"></span>
+                                ผ่านการสอบ
+                            </span>
+                        </label>
+                        <label for="pass-with-revision">
+                            <input type="radio" id="pass-with-revision" name="evaluation" value="ผ่านแบบแก้ไข"
+                                onchange="toggleCommentArea()">
+                            <span class="radio-option">
+                                <span class="custom-radio"></span>
+                                ผ่านแบบแก้ไข
+                            </span>
+                        </label>
+                        <label for="fail">
+                            <input type="radio" id="fail" name="evaluation" value="ไม่ผ่านการสอบจบโครงงาน"
+                                onchange="toggleCommentArea()">
+                            <span class="radio-option">
+                                <span class="custom-radio"></span>
+                                ไม่ผ่านการสอบจบโครงงาน
+                            </span>
+                        </label>
+                    </div>
+                </div>
+                <div id="comment-area" class="mb-6 p-4 bg-gray-50 rounded-lg hidden">
+                    <div class="section-header">
+                        <h4 class="text-xl font-bold text-gray-800">ความคิดเห็น (ถ้ามี):</h4>
+                    </div>
+                    <textarea id="comment" rows="4"
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                        placeholder="ใส่ความคิดเห็นหรือข้อเสนอแนะ"></textarea>
+                </div>
+                <button onclick="submitEvaluation()"
+                    class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full transition-colors duration-200 text-lg shadow-md">
+                    บันทึกผลการประเมิน
+                </button>
+            </div>
+        </div>
+    </div>
+    <footer class="bg-gradient-to-r from-blue-800 to-blue-900 text-white py-4 mt-auto shadow-lg">
+        <div
+            class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-center md:text-left space-y-2 md:space-y-0">
+            <div class="flex items-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-300" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+                <p class="font-bold text-sm md:text-base">ระบบยื่นสอบโครงงานพิเศษและโครงงานสหกิจ</p>
+                <span class="hidden md:inline text-blue-200 text-xs md:text-sm">|</span>
+                <p class="text-blue-200 text-xs md:text-sm">ภาควิชาเทคโนโลยีสารสนเทศ มจพ. วิทยาเขตปราจีน</p>
+            </div>
+
+            <div class="text-xs md:text-sm text-center md:text-right">
+                <p class="font-semibold text-blue-100">จัดทำโดย: นายกัณติกรณ์ สรสุริยวงษ์ และ นายพีรพล บัวขยาย</p>
+            </div>
+        </div>
+
+        <hr class="border-blue-700 my-2 opacity-70">
+
+        <p class="text-center text-xs text-blue-300">
+            &copy; 2025 King Mongkut's University of Technology North Bangkok. All Rights Reserved.
+        </p>
+    </footer>
+
+    <script>
+        const projectsData = [
+            {
+                id: 1,
+                name: "ระบบบริหารจัดการทรัพยากรบุคคลสำหรับธุรกิจขนาดเล็ก",
+                authors: "นายพลากร แพทย์นุเคราะห์ และ นายวุฒิพงษ์ วังรัตน์",
+                details: {
+                    members: [{ name: "นายพลากร แพทย์นุเคราะห์", id: "6806022510092", year: 4 }, { name: "นายวุฒิพงษ์ วังรัตน์", id: "6806022510106", year: 4 }],
+                    advisor: "ผศ.นพดล บูรณ์กุศล"
+                },
+                evaluationStatus: "รอประเมิน",
+                evaluationResult: ""
+            },
+            {
+                id: 2,
+                name: "แอปพลิเคชันแนะนำสถานที่ท่องเที่ยวเชิงวัฒนธรรม",
+                authors: "นางสาวธิติญา โพธิ์ศรี และ นายภูมิรพี เมืองไทย",
+                details: {
+                    members: [{ name: "นางสาวธิติญา โพธิ์ศรี", id: "6806022510084", year: 3 }, { name: "นายภูมิรพี เมืองไทย", id: "6806022510157", year: 3 }],
+                    advisor: "ผศ.ดร.ขนิษฐา นามี"
+                },
+                evaluationStatus: "ประเมินแล้ว",
+                evaluationResult: "ผ่านสมบูรณ์"
+            },
+            {
+                id: 3,
+                name: "ระบบจัดการคลังสินค้าอัตโนมัติด้วยเทคโนโลยี IoT",
+                authors: "นายนันทวัฒน์ นันทวิสาร และ นายกัณติกรณ์ สรสุริยวงษ์",
+                details: {
+                    members: [{ name: "นายนันทวัฒน์ นันทวิสาร", id: "6806022510050", year: 4 }, { name: "นายกัณติกรณ์ สรสุริยวงษ์", id: "6806022510068", year: 4 }],
+                    advisor: "ผศ.ดร.นิติการ นาคเจือทอง"
+                },
+                evaluationStatus: "รอประเมิน",
+                evaluationResult: ""
+            },
+            {
+                id: 4,
+                name: "ระบบควบคุมการเข้าถึงด้วยใบหน้าสำหรับอาคาร",
+                authors: "นายกณวรรธน์ เดชแสง และ นายบุญญฤทธิ์ วุฒิ",
+                details: {
+                    members: [{ name: "นายกณวรรธน์ เดชแสง", id: "6806022510076", year: 3 }, { name: "นายบุญญฤทธิ์ วุฒิ", id: "6806022510173", year: 4 }],
+                    advisor: "ผศ.ดร.สุปีติ กุลจันทร์"
+                },
+                evaluationStatus: "ประเมินแล้ว",
+                evaluationResult: "ผ่านแบบแก้ไข"
+            },
+            {
+                id: 5,
+                name: "แพลตฟอร์มการเรียนรู้ออนไลน์สำหรับเด็กประถม",
+                authors: "นางสาวสุกัญญา มาพระยืน",
+                details: {
+                    members: [{ name: "นางสาวสุกัญญา มาพระยืน", id: "6806022510211", year: 3 }],
+                    advisor: "ผศ.ดร.สุพาภรณ์ ซิ้มเจริญ"
+                },
+                evaluationStatus: "รอประเมิน",
+                evaluationResult: ""
+            },
+            {
+                id: 6,
+                name: "ระบบแจ้งเตือนน้ำท่วมอัจฉริยะ",
+                authors: "นายศิริโรจน์ อุดมเดช และ นายลัทธพล ศิริหล้า",
+                details: {
+                    members: [{ name: "นายศิริโรจน์ อุดมเดช", id: "6806022510271", year: 3 }, { name: "นายลัทธพล ศิริหล้า", id: "6806022510289", year: 3 }],
+                    advisor: "รศ.ดร.อนิราช มิ่งขวัญ"
+                },
+                evaluationStatus: "ประเมินแล้ว",
+                evaluationResult: "ผ่านสมบูรณ์"
+            },
+            {
+                id: 7,
+                name: "ระบบจำลองตลาดหุ้นเสมือนจริง",
+                authors: "นางสาวฐิติรัตน์ แดงประเสริฐ และ นายก้องกาย วงษ์มอญ",
+                details: {
+                    members: [{ name: "นางสาวฐิติรัตน์ แดงประเสริฐ", id: "6806022510297", year: 4 }, { name: "นายก้องกาย วงษ์มอญ", id: "6806022510319", year: 3 }],
+                    advisor: "ผศ.ดร.บีสุดา ดาวเรือง"
+                },
+                evaluationStatus: "ประเมินแล้ว",
+                evaluationResult: "ไม่ผ่านการสอบจบโครงงาน"
+            }
+        ];
+
+        let currentProjectId = null;
+        let statusChart, resultChart;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDashboard();
+            renderCharts();
+            renderProjectTable();
+            document.getElementById('statusFilter').addEventListener('change', filterTable);
+        });
+
+        function renderDashboard() {
+            const pendingProjects = projectsData.filter(p => p.evaluationStatus === "รอประเมิน").length;
+            const evaluatedProjects = projectsData.filter(p => p.evaluationStatus === "ประเมินแล้ว").length;
+            const totalProjects = projectsData.length;
+
+            document.getElementById('totalProjects').textContent = totalProjects;
+            document.getElementById('pendingCount').textContent = pendingProjects;
+            document.getElementById('evaluatedCount').textContent = evaluatedProjects;
+            document.getElementById('allCount').textContent = totalProjects;
+        }
+
+        function filterTable() {
+            const selectedStatus = document.getElementById('statusFilter').value;
+            renderProjectTable(selectedStatus);
+        }
+
+        function renderProjectTable(filterValue = 'ทั้งหมด') {
+            const cardsContainer = document.getElementById('projectCardsContainer');
+            cardsContainer.innerHTML = '';
+
+            let filteredProjects = projectsData;
+
+            if (filterValue !== 'ทั้งหมด') {
+                if (filterValue === 'รอประเมิน' || filterValue === 'ประเมินแล้ว') {
+                    filteredProjects = projectsData.filter(p => p.evaluationStatus === filterValue);
+                } else {
+                    filteredProjects = projectsData.filter(p => p.evaluationResult === filterValue);
+                }
+            }
+
+            filteredProjects.forEach(project => {
+                let statusBadge = '';
+                let actionButton = '';
+
+                if (project.evaluationStatus === "รอประเมิน") {
+                    statusBadge = `<span class="bg-yellow-200 text-yellow-800 py-1 px-3 rounded-full text-xs font-semibold">รอประเมิน</span>`;
+                    actionButton = `<button onclick="showEvaluationModal(${project.id})" class="mt-4 w-full bg-blue-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200 shadow-md">ประเมินผล</button>`;
+                } else {
+                    const statusText = project.evaluationResult ? `${project.evaluationResult}` : "ประเมินแล้ว";
+                    statusBadge = `<span class="bg-green-200 text-green-800 py-1 px-3 rounded-full text-xs font-semibold">${statusText}</span>`;
+                    actionButton = `<button disabled class="mt-4 w-full bg-gray-400 text-white font-bold py-2 px-4 rounded-lg">ประเมินแล้ว</button>`;
+                }
+
+                const card = document.createElement('div');
+                card.classList.add('bg-white', 'rounded-xl', 'shadow-lg', 'p-6', 'flex', 'flex-col', 'justify-between', 'transform', 'transition-all', 'duration-300', 'hover:scale-105', 'hover:shadow-2xl');
+                card.innerHTML = `
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-lg font-bold text-gray-800 leading-tight">${project.name}</h3>
+                            <div class="flex-shrink-0">${statusBadge}</div>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-2"><strong>รหัสโครงงาน:</strong> ${project.id}</p>
+                        <p class="text-gray-600 text-sm"><strong>ผู้จัดทำ:</strong> ${project.authors}</p>
+                    </div>
+                    ${actionButton}
+                `;
+                cardsContainer.appendChild(card);
+            });
+        }
+
+        function renderCharts() {
+            const primaryBlue = '#1d4ed8';
+            const blueTones = ['#38a3f8', '#73b9f9', '#aed2fc'];
+            const grayTones = ['#a1a1aa', '#e4e4e7'];
+
+            const pendingCount = projectsData.filter(p => p.evaluationStatus === "รอประเมิน").length;
+            const evaluatedCount = projectsData.filter(p => p.evaluationStatus === "ประเมินแล้ว").length;
+            const statusCtx = document.getElementById('evaluationStatusChart').getContext('2d');
+            if (statusChart) statusChart.destroy();
+            statusChart = new Chart(statusCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['รอประเมิน', 'ประเมินแล้ว'],
+                    datasets: [{
+                        label: 'จำนวนโครงงาน',
+                        data: [pendingCount, evaluatedCount],
+                        backgroundColor: [blueTones[0], blueTones[1]],
+                        borderColor: [primaryBlue, primaryBlue],
+                        borderWidth: 1,
+                        borderRadius: 5,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0 }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            const passedCount = projectsData.filter(p => p.evaluationResult === "ผ่านสมบูรณ์").length;
+            const revisedCount = projectsData.filter(p => p.evaluationResult === "ผ่านแบบแก้ไข").length;
+            const failedCount = projectsData.filter(p => p.evaluationResult === "ไม่ผ่านการสอบจบโครงงาน").length;
+            const resultCtx = document.getElementById('evaluationResultChart').getContext('2d');
+            if (resultChart) resultChart.destroy();
+            resultChart = new Chart(resultCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['ผ่านสมบูรณ์', 'ผ่านแบบแก้ไข', 'ไม่ผ่าน'],
+                    datasets: [{
+                        data: [passedCount, revisedCount, failedCount],
+                        backgroundColor: [blueTones[1], blueTones[2], grayTones[0]],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        function showEvaluationModal(projectId) {
+            const project = projectsData.find(p => p.id === projectId);
+            if (!project) return;
+            currentProjectId = projectId;
+
+            document.getElementById('evalProjectName').textContent = project.name;
+            document.getElementById('evalAdvisor').textContent = project.details.advisor;
+
+            const membersList = document.getElementById('evalMembers');
+            membersList.innerHTML = '';
+            project.details.members.forEach(member => {
+                const memberElement = document.createElement('p');
+                memberElement.innerHTML = `<strong>ชื่อสมาชิก:</strong> ${member.name} (${member.id}) ชั้นปีที่ ${member.year}`;
+                membersList.appendChild(memberElement);
+            });
+
+            const evaluationRadios = document.getElementsByName('evaluation');
+            evaluationRadios.forEach(radio => radio.checked = false);
+            document.getElementById('comment-area').classList.add('hidden');
+            document.getElementById('comment').value = '';
+
+            const modal = document.getElementById('evaluationModal');
+            modal.classList.add('is-active');
+            modal.style.display = 'flex';
+        }
+
+        function closeEvaluationModal() {
+            const modal = document.getElementById('evaluationModal');
+            modal.classList.remove('is-active');
+            setTimeout(() => { modal.style.display = 'none'; }, 300);
+        }
+
+        function toggleCommentArea() {
+            const revisionRadio = document.getElementById('pass-with-revision');
+            const commentArea = document.getElementById('comment-area');
+            if (revisionRadio.checked) {
+                commentArea.classList.remove('hidden');
+            } else {
+                commentArea.classList.add('hidden');
+            }
+        }
+
+        function submitEvaluation() {
+            const selectedEvaluation = document.querySelector('input[name="evaluation"]:checked');
+            const comment = document.getElementById('comment').value;
+
+            if (!selectedEvaluation) {
+                alert('กรุณาเลือกสถานะการประเมิน');
+                return;
+            }
+
+            const evaluationResult = selectedEvaluation.value;
+            const project = projectsData.find(p => p.id === currentProjectId);
+
+            if (evaluationResult === 'ผ่านแบบแก้ไข' && comment.trim() === '') {
+                alert('กรุณากรอกความคิดเห็นสำหรับการแก้ไข');
+                return;
+            }
+
+            project.evaluationStatus = 'ประเมินแล้ว';
+            project.evaluationResult = evaluationResult;
+
+            alert('บันทึกผลการประเมินเรียบร้อยแล้ว');
+            closeEvaluationModal();
+            renderDashboard();
+            renderProjectTable(document.getElementById('statusFilter').value);
+            renderCharts();
+        }
+
+        window.onclick = function (event) {
+            const modal = document.getElementById('evaluationModal');
+            if (event.target === modal) {
+                closeEvaluationModal();
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+    // Get the sidebar and the open/close buttons
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOpenBtn = document.getElementById('sidebar-open-btn'); // Add a button to open the sidebar
+    const sidebarCloseBtn = document.getElementById('sidebar-close-btn');
+
+    // Function to open the sidebar
+    function openSidebar() {
+        sidebar.classList.remove('-left-full'); // Or whichever class you use to hide it
+        sidebar.classList.add('left-0');
+    }
+
+    // Function to close the sidebar
+    function closeSidebar() {
+        sidebar.classList.remove('left-0');
+        sidebar.classList.add('-left-full'); // Or whichever class you use to hide it
+    }
+
+    // Add a click event to the close button
+    if (sidebarCloseBtn) {
+        sidebarCloseBtn.addEventListener('click', closeSidebar);
+    }
+    
+    // Add a click event to an open button (you'll need to add this to your HTML)
+    if (sidebarOpenBtn) {
+        sidebarOpenBtn.addEventListener('click', openSidebar);
+    }
+
+    // แก้ไข: ปรับโค้ดการปิด sidebar เมื่อคลิกนอกพื้นที่
+    // เพิ่มเงื่อนไขว่าโค้ดนี้จะทำงานเฉพาะบนหน้าจอขนาดเล็กกว่า 1024px เท่านั้น
+    window.addEventListener('click', function(event) {
+        if (window.innerWidth < 1024) { // ตรวจสอบขนาดหน้าจอ
+            if (!sidebar.contains(event.target) && !event.target.closest('#sidebar-open-btn')) {
+                closeSidebar();
+            }
+        }
+    });
+
+    // Add responsive behavior based on screen size
+    function handleResize() {
+        if (window.innerWidth >= 1024) { // Tailwind's 'lg' breakpoint
+            sidebar.classList.remove('fixed', '-left-full');
+            sidebar.classList.add('relative', 'left-0');
+        } else {
+            sidebar.classList.remove('relative', 'left-0');
+            sidebar.classList.add('fixed', '-left-full');
+        }
+    }
+
+    // Run on page load and on window resize
+    handleResize();
+    window.addEventListener('resize', handleResize);
+});
+    </script>
+</body>
+
+</html>

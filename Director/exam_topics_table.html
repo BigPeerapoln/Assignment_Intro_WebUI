@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ตารางสอบหัวข้อโครงงาน</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .header-bg {
+            background-color: #1a237e;
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            border-left: 6px solid #4ade80;
+        }
+
+        .summary-card.blue {
+            border-left-color: #3b82f6;
+        }
+
+        .summary-icon {
+            width: 3rem;
+            height: 3rem;
+            color: #1a237e;
+        }
+
+        .summary-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a237e;
+        }
+
+        .summary-title {
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: #4b5563;
+        }
+
+        .filter-container {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .filter-select,
+        .filter-date {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid #d1d5db;
+            font-family: 'Kanit', sans-serif;
+        }
+
+        .exam-table {
+            background-color: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .exam-table thead th {
+            background-color: #1a237e;
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .exam-table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+        .exam-table tbody tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+        .exam-table tbody tr:hover {
+            background-color: #e5e7eb;
+        }
+
+        .exam-table tbody td {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-view-details {
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+            display: inline-block;
+        }
+
+        .btn-view-details:hover {
+            background-color: #2563eb;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 700px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-close-btn {
+            float: right;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #aaa;
+            transition: color 0.3s;
+        }
+
+        .modal-close-btn:hover,
+        .modal-close-btn:focus {
+            color: #333;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a237e;
+            border-left: 4px solid #3b82f6;
+            padding-left: 0.75rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .tab-button.active {
+            color: #2563eb;
+            font-weight: bold;
+            border-color: #2563eb;
+        }
+
+        /* ซ่อนข้อความเมนูใน Sidebar บนหน้าจอขนาดใหญ่ */
+        @media (min-width: 1024px) {
+            .sidebar-link-text {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen">
+
+    <header class="header-bg">
+        <div class="container mx-auto px-6 flex items-center justify-between">
+            <button id="sidebar-open-btn" class="lg:hidden p-2 text-white focus:outline-none">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7">
+                    </path>
+                </svg>
+            </button>
+            <span class="text-2xl font-bold">ตารางการสอบหัวข้อโครงงาน</span>
+            <span class="text-lg font-medium">ผศ.ดร.นิติการ นาคเจือทอง</span>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 flex-grow">
+        <aside id="sidebar"
+            class="sidebar lg:relative fixed top-0 left-0 h-full overflow-y-auto z-30 lg:block lg:p-4 bg-white shadow-md flex-grow min-h-screen col-span-2 w-[280px]">
+            <div
+                class="p-4 bg-indigo-700 text-white flex items-center justify-between lg:justify-start lg:rounded-t-lg lg:hidden">
+                <h3 class="text-xl font-bold">เมนู</h3>
+                <button id="sidebar-close-btn" class="lg:hidden text-white text-2xl">&times;</button>
+            </div>
+            <nav class=" bg-white lg:rounded-b-lg">
+                <ul class="space-y-2">
+                    <a href="dashbroad_director.html"
+                        class="flex items-center p-3 text-white bg-indigo-600 rounded-md transition-colors w-64">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-white" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1" />
+                        </svg>
+                        กลับหน้าหลัก
+                    </a>
+                    <li>
+                        <a href="exam_topics_table.html"
+                            class="flex items-center p-3 text-white bg-indigo-600 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-white" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-8a1 1 0 10-2 0v4a1 1 0 102 0v-4zm5-4a1 1 0 00-1-1H7a1 1 0 00-1 1v2a1 1 0 001 1h6a1 1 0 001-1V6z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            ตารางสอบหัวข้อโครงงาน
+                        </a>
+                    </li>
+                    <li>
+                        <a href="Evaluation_toppic.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 7.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zM7.5 10a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5zM7.5 12.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" />
+                            </svg>
+                            ประเมินผลสอบหัวข้อโครงงาน
+                        </a>
+                    </li>
+                    <li>
+                        <a href="status_topic.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 7.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zM7.5 10a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5zM7.5 12.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" />
+                            </svg>
+                            ติดตามสถานะโครงงานประเมิน
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="schedule_final.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M9 2a1 1 0 00-1 1v2a1 1 0 002 0V3a1 1 0 00-1-1zM5.553 4.847a1 1 0 00-1.414 1.414l1.414 1.414a1 1 0 101.414-1.414L5.553 4.847zM3 9a1 1 0 000 2h2a1 1 0 100-2H3zM4.847 14.447a1 1 0 00-1.414-1.414l-1.414 1.414a1 1 0 101.414 1.414l1.414-1.414zM9 17a1 1 0 00-1 1v2a1 1 0 102 0v-2a1 1 0 00-1-1zM14.447 19.153a1 1 0 001.414-1.414l-1.414-1.414a1 1 0 00-1.414 1.414l1.414 1.414zM17 10a1 1 0 000-2h2a1 1 0 100 2h-2zM19.153 14.447a1 1 0 00-1.414 1.414l1.414 1.414a1 1 0 001.414-1.414l-1.414-1.414z" />
+                            </svg>
+                            ตารางรายขึ้นสอบจบโครงงาน
+                        </a>
+                    </li>
+                    <li>
+                        <a href="Evaluation_final_Test.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M2 4a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V4zm2-2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4z"
+                                    clip-rule="evenodd" fill-rule="evenodd" />
+                                <path fill-rule="evenodd"
+                                    d="M7 6a1 1 0 00-1 1v8a1 1 0 102 0V7a1 1 0 00-1-1zM10 6a1 1 0 00-1 1v6a1 1 0 102 0V7a1 1 0 00-1-1zM13 6a1 1 0 00-1 1v4a1 1 0 102 0V7a1 1 0 00-1-1z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            ประเมินผลขึ้นสอบโครงงานจบ
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="Sign_off_project.html"
+                            class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors w-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-500"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M2 4a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V4zm2-2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4z"
+                                    clip-rule="evenodd" fill-rule="evenodd" />
+                                <path fill-rule="evenodd"
+                                    d="M7 6a1 1 0 00-1 1v8a1 1 0 102 0V7a1 1 0 00-1-1zM10 6a1 1 0 00-1 1v6a1 1 0 102 0V7a1 1 0 00-1-1zM13 6a1 1 0 00-1 1v4a1 1 0 102 0V7a1 1 0 00-1-1z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            ลงนามเอกสารโครงงานจบ
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        <main class="flex-grow p-8 col-span-10">
+            <div class="container mx-auto">
+                <h1 class="text-4xl font-bold text-gray-800 mb-6">ตารางสอบในฐานะกรรมการ</h1>
+
+                <div class="flex border-b border-gray-300 mb-6">
+                    <a href="project_list.html"
+                        class="tab-button py-3 px-6 text-center text-gray-500 font-medium active border-b-2 border-blue-700">
+                        ติดตามสถานะสอบหัวข้อโครงงาน
+                    </a>
+
+                    <a href="Evaluation_topic.html" class="tab-button py-3 px-6 text-center text-gray-500 font-medium">
+                        ประเมินผลการสอบหัวข้อโครงงาน
+                    </a>
+                </div>
+
+                <div id="pendingTableSection" class="exam-section">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="summary-card">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="summary-icon text-green-500"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-8.6"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            <div>
+                                <div id="exam-count-pending" class="summary-number">0</div>
+                                <div class="summary-title">โครงงานรอการอนุมัติในสัปดาห์ที่เลือก</div>
+                            </div>
+                        </div>
+                        <div class="summary-card blue">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="summary-icon text-blue-500"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            <div>
+                                <div id="current-date-pending" class="summary-number"></div>
+                                <div class="summary-title">ข้อมูล ณ วันที่</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filter-container mb-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="week-filter-pending"
+                                    class="block text-gray-700 font-semibold mb-2">กรองตามสัปดาห์:</label>
+                                <select id="week-filter-pending" class="filter-select">
+                                    <option value="">ทั้งหมด</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="date-filter-pending"
+                                    class="block text-gray-700 font-semibold mb-2">เลือกวันที่:</label>
+                                <input type="date" id="date-filter-pending" class="filter-date">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="exam-table">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-sm font-medium">ชื่อโครงงาน</th>
+                                    <th class="px-6 py-3 text-sm font-medium">วันที่</th>
+                                    <th class="px-6 py-3 text-sm font-medium">เวลา</th>
+                                    <th class="px-6 py-3 text-sm font-medium">รายละเอียด</th>
+                                </tr>
+                            </thead>
+                            <tbody id="exam-table-body-pending" class="bg-white divide-y divide-gray-200">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <div id="examModal" class="modal-overlay hidden flex">
+        <div class="modal-content">
+            <span class="modal-close-btn" onclick="closeModal()">&times;</span>
+            <div class="modal-header">
+                <h2 class="text-3xl font-bold text-gray-800">รายละเอียดการสอบ</h2>
+            </div>
+
+            <div class="p-4 rounded-lg bg-gray-50 border border-gray-200 mb-4">
+                <h3 class="modal-section-title">ข้อมูลการสอบ</h3>
+                <p><strong class="text-gray-700">ชื่อโครงงาน (ภาษาไทย):</strong> <span id="exam-project-th"></span></p>
+                <p><strong class="text-gray-700">ชื่อโครงงาน (ภาษาอังกฤษ):</strong> <span id="exam-project-en"></span>
+                </p>
+                <p><strong class="text-gray-700">วันที่:</strong> <span id="exam-date"></span></p>
+                <p><strong class="text-gray-700">เวลา:</strong> <span id="exam-time"></span></p>
+                <p><strong class="text-gray-700">สถานที่:</strong> <span id="exam-location"></span></p>
+            </div>
+
+            <div class="p-4 rounded-lg bg-gray-50 border border-gray-200 mb-4">
+                <h3 class="modal-section-title">ผู้จัดทำโครงงาน</h3>
+                <div id="exam-students"></div>
+            </div>
+
+            <div class="p-4 rounded-lg bg-gray-50 border border-gray-200">
+                <h3 class="modal-section-title">คณะกรรมการ</h3>
+                <div id="exam-committee"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-gradient-to-r from-blue-800 to-blue-900 text-white py-4 mt-auto shadow-lg">
+        <div
+            class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-center md:text-left space-y-2 md:space-y-0">
+            <div class="flex items-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-300" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+                <p class="font-bold text-sm md:text-base">ระบบสอบโครงงานพิเศษและโครงงานสหกิจ</p>
+                <span class="hidden md:inline text-blue-200 text-xs md:text-sm">|</span>
+                <p class="text-blue-200 text-xs md:text-sm">ภาควิชาเทคโนโลยีสารสนเทศ มจพ. วิทยาเขตปราจีน</p>
+            </div>
+
+            <div class="text-xs md:text-sm text-center md:text-right">
+                <p class="font-semibold text-blue-100">จัดทำโดย: นายกัณติกรณ์ สรสุริยวงษ์ และ นายพีรพล บัวขยาย</p>
+            </div>
+        </div>
+
+        <hr class="border-blue-700 my-2 opacity-70">
+
+        <p class="text-center text-xs text-blue-300">
+            &copy; 2025 King Mongkut's University of Technology North Bangkok. All Rights Reserved.
+        </p>
+    </footer>
+
+    <script>
+        // const examData = [{
+        //     project_th: "ระบบวิเคราะห์ข้อมูลการขายสำหรับธุรกิจ SME",
+        //     project_en: "Sales Data Analytics System for SMEs",
+        //     date: "2025-09-01", // Week 1
+        //     time: "10:00 - 11:00 น.",
+        //     location: "อาคาร 10 ห้อง 10-302",
+        //     students: [{
+        //         name: "นายธนพล สุขใจ",
+        //         id: "651234567-8"
+        //     }, {
+        //         name: "นางสาวจิราพร มีชัย",
+        //         id: "651234567-9"
+        //     }],
+        //     committee: [{
+        //         name: "ผศ.ดร.นิติการ นาคเจือทอง",
+        //         role: "กรรมการ"
+        //     }, {
+        //         name: "รศ.ดร.ชลธิชา สุขเกษม",
+        //         role: "ประธาน"
+        //     }, {
+        //         name: "ผศ.พงษ์ศักดิ์ รุ่งเรือง",
+        //         role: "กรรมการ"
+        //     }],
+        //     status: "pending"
+        // }, {
+        //     project_th: "แอปพลิเคชันแนะนำร้านอาหารโดยใช้ AI",
+        //     project_en: "AI-Powered Restaurant Recommendation Application",
+        //     date: "2025-09-08", // Week 2
+        //     time: "11:00 - 12:00 น.",
+        //     location: "อาคาร 12 ห้อง 12-205",
+        //     students: [{
+        //         name: "นายวรวุฒิ รักษาพงษ์",
+        //         id: "643456789-0"
+        //     }],
+        //     committee: [{
+        //         name: "ผศ.ดร.นิติการ นาคเจือทอง",
+        //         role: "กรรมการ"
+        //     }, {
+        //         name: "อ.กฤษดา เก่งจริง",
+        //         role: "ประธาน"
+        //     }, {
+        //         name: "รศ.อัจฉรา มีคุณธรรม",
+        //         role: "กรรมการ"
+        //     }],
+        //     status: "approved"
+        // }, {
+        //     project_th: "ระบบบริหารจัดการการเกษตรอัจฉริยะ",
+        //     project_en: "Smart Agriculture Management System",
+        //     date: "2025-09-15", // Week 3
+        //     time: "13:00 - 14:00 น.",
+        //     location: "อาคาร 10 ห้อง 10-401",
+        //     students: [{
+        //         name: "นายวิโรจน์ แสนดี",
+        //         id: "647890123-4"
+        //     }, {
+        //         name: "นายสุชาติ มั่งคั่ง",
+        //         id: "647890123-5"
+        //     }],
+        //     committee: [{
+        //         name: "รศ.ดร.มานะ รักชาติ",
+        //         role: "ประธาน"
+        //     }, {
+        //         name: "ผศ.ดร.นิติการ นาคเจือทอง",
+        //         role: "กรรมการ"
+        //     }, {
+        //         name: "ดร.วรรณภา พิทักษ์ไทย",
+        //         role: "กรรมการ"
+        //     }],
+        //     status: "pending"
+        // }, {
+        //     project_th: "แพลตฟอร์มจัดการตารางเรียนอัตโนมัติ",
+        //     project_en: "Automated Class Scheduling Platform",
+        //     date: "2025-09-22", // Week 4
+        //     time: "09:00 - 10:00 น.",
+        //     location: "ห้องประชุม 1",
+        //     students: [{
+        //         name: "นายอานนท์ ใจดี",
+        //         id: "654567890-1"
+        //     }],
+        //     committee: [{
+        //         name: "ผศ.ดร.นิติการ นาคเจือทอง",
+        //         role: "ประธาน"
+        //     }, {
+        //         name: "ดร.สมชาย ใจกล้า",
+        //         role: "กรรมการ"
+        //     }, {
+        //         name: "รศ.มาลี รักคุณ",
+        //         role: "กรรมการ"
+        //     }],
+        //     status: "approved"
+        // }, {
+        //     project_th: "ระบบติดตามสุขภาพผู้สูงอายุ",
+        //     project_en: "Elderly Health Monitoring System",
+        //     date: "2025-09-29", // Week 5 (จะถูกซ่อนจากฟิลเตอร์)
+        //     time: "14:00 - 15:00 น.",
+        //     location: "อาคาร 15 ห้อง 15-101",
+        //     students: [{
+        //         name: "นางสาวพิกุล แก้วงาม",
+        //         id: "649876543-2"
+        //     }],
+        //     committee: [{
+        //         name: "ผศ.ดร.นิติการ นาคเจือทอง",
+        //         role: "กรรมการ"
+        //     }, {
+        //         name: "ดร.ไพศาล มั่นคง",
+        //         role: "ประธาน"
+        //     }, {
+        //         name: "อ.ดารณี รักษาศิล",
+        //         role: "กรรมการ"
+        //     }],
+        //     status: "pending"
+        // }];
+        const examData = [{
+            project_th: "ระบบวิเคราะห์ข้อมูลการขายสำหรับธุรกิจ SME",
+            project_en: "Sales Data Analytics System for SMEs",
+            date: "2025-09-01", // Week 1
+            time: "10:00 - 11:00 น.",
+            location: "อาคาร 10 ห้อง 10-302",
+            students: [{
+                name: "นายศตวรรษ บัวผัน",
+                id: "6806022510581"
+            }, {
+                name: "นายไกรกูล แสงบุตรดี",
+                id: "6806022510599"
+            }],
+            committee: [{
+                name: "ผศ.ดร.นิติการ นาคเจือทอง",
+                role: "กรรมการ"
+            }, {
+                name: "รศ.ดร.อนิราช มิ่งขวัญ",
+                role: "ประธาน"
+            }, {
+                name: "ผศ.นพดล บูรณ์กุศล",
+                role: "กรรมการ"
+            }, {
+                name: "ผศ.ดร.บีสุดา ดาวเรือง",
+                role: "กรรมการ"
+            }],
+            status: "pending"
+        }, {
+            project_th: "แอปพลิเคชันแนะนำร้านอาหารโดยใช้ AI",
+            project_en: "AI-Powered Restaurant Recommendation Application",
+            date: "2025-09-08", // Week 2
+            time: "11:00 - 12:00 น.",
+            location: "อาคาร 12 ห้อง 12-205",
+            students: [{
+                name: "นายขรรค์ชัย ลิ้มประเสริฐ",
+                id: "6806022510033"
+            }],
+            committee: [{
+                name: "ผศ.อรบุษป์ วุฒิกมลชัย",
+                role: "กรรมการ"
+            }, {
+                name: "ผศ.ดร.บีสุดา ดาวเรือง",
+                role: "ประธาน"
+            }, {
+                name: "ผศ.ดร.ขนิษฐา นามี",
+                role: "กรรมการ"
+            }, {
+                name: "ผศ.นพดล บูรณ์กุศล",
+                role: "กรรมการ"
+            }],
+            status: "approved"
+        }, {
+            project_th: "ระบบบริหารจัดการการเกษตรอัจฉริยะ",
+            project_en: "Smart Agriculture Management System",
+            date: "2025-09-15", // Week 3
+            time: "13:00 - 14:00 น.",
+            location: "อาคาร 10 ห้อง 10-401",
+            students: [{
+                name: "นายนันทวัฒน์ นันทวิสาร",
+                id: "6806022510050"
+            }, {
+                name: "นายกัณติกรณ์ สรสุริยวงษ์",
+                id: "6806022510068"
+            }],
+            committee: [{
+                name: "อ.ดร.กาญจน ณ ศรีธะ",
+                role: "ประธาน"
+            }, {
+                name: "ผศ.จสต.นพเก้า ทองใบ",
+                role: "กรรมการ"
+            }, {
+                name: "ผศ.นิมิต ศรีคำทา",
+                role: "กรรมการ"
+            }, {
+                name: "ผศ.ดร.นิติการ นาคเจือทอง",
+                role: "กรรมการ"
+            }],
+            status: "pending"
+        }, {
+            project_th: "แพลตฟอร์มจัดการตารางเรียนอัตโนมัติ",
+            project_en: "Automated Class Scheduling Platform",
+            date: "2025-09-22", // Week 4
+            time: "09:00 - 10:00 น.",
+            location: "ห้องประชุม 1",
+            students: [{
+                name: "นายบุญญฤทธิ์ วุฒิ",
+                id: "6806022510173"
+            }],
+            committee: [{
+                name: "อ.ดร.พิทย์พิมล ชูรอด",
+                role: "ประธาน"
+            }, {
+                name: "ผศ.ดร.พาฝัน ดวงไพศาล",
+                role: "กรรมการ"
+            }, {
+                name: "อ.ดร.ประดิษฐ์ พิทักษ์เสถียรกุล",
+                role: "กรรมการ"
+            }, {
+                name: "ผศ.ดร.ขนิษฐา นามี",
+                role: "กรรมการ"
+            }],
+            status: "approved"
+        }, {
+            project_th: "ระบบติดตามสุขภาพผู้สูงอายุ",
+            project_en: "Elderly Health Monitoring System",
+            date: "2025-09-29", // Week 5 (จะถูกซ่อนจากฟิลเตอร์)
+            time: "14:00 - 15:00 น.",
+            location: "อาคาร 15 ห้อง 15-101",
+            students: [{
+                name: "นางสาวธิติญา โพธิ์ศรี",
+                id: "6806022510084"
+            }, {
+                name: "นายพลากร แพทย์นุเคราะห์",
+                id: "6806022510092"
+            }],
+            committee: [{
+                name: "ผศ.พีระศักดิ์ เสรีกุล",
+                role: "กรรมการ"
+            }, {
+                name: "ผศ.สมชัย เชียงพงศ์พันธุ์",
+                role: "ประธาน"
+            }, {
+                name: "ผศ.ดร.สุปีติ กุลจันทร์",
+                role: "กรรมการ"
+            }, {
+                name: "รศ.ดร.อนิราช มิ่งขวัญ",
+                role: "กรรมการ"
+            }],
+            status: "pending"
+        }, {
+            project_th: "เว็บไซต์จัดการนัดหมายออนไลน์สำหรับคลินิก",
+            project_en: "Online Appointment Management Website for Clinics",
+            date: "2025-09-15", // Week 3
+            time: "14:00 - 15:00 น.",
+            location: "อาคาร 10 ห้อง 10-402",
+            students: [{
+                name: "นายกฤษนัย โถมสันเทียะ",
+                id: "6806022510203"
+            }],
+            committee: [{
+                name: "ผศ.นิมิต ศรีคำทา",
+                role: "ประธาน"
+            }, {
+                name: "ผศ.นพดล บูรณ์กุศล",
+                role: "กรรมการ"
+            }, {
+                name: "รศ.ดร.อนิราช มิ่งขวัญ",
+                role: "กรรมการ"
+            }, {
+                name: "ผศ.ดร.ขนิษฐา นามี",
+                role: "กรรมการ"
+            }],
+            status: "pending"
+        }, {
+            project_th: "ระบบตรวจสอบความถูกต้องของข้อมูล",
+            project_en: "Data Integrity Verification System",
+            date: "2025-09-22", // Week 4
+            time: "10:00 - 11:00 น.",
+            location: "ห้องประชุม 2",
+            students: [{
+                name: "นางสาวสุกัญญา มาพระยืน",
+                id: "6806022510211"
+            }, {
+                name: "นายอาณัฐ อรรถวิเวก",
+                id: "6806022510220"
+            }],
+            committee: [{
+                name: "อ.ดร.กาญจน ณ ศรีธะ",
+                role: "ประธาน"
+            }, {
+                name: "ผศ.ดร.พาฝัน ดวงไพศาล",
+                role: "กรรมการ"
+            }, {
+                name: "อ.สุดา รักษ์ดี",
+                role: "กรรมการ"
+            }, {
+                name: "ผศ.พีระศักดิ์ เสรีกุล",
+                role: "กรรมการ"
+            }],
+            status: "pending"
+        }];
+
+        // กรองข้อมูลสำหรับแสดงในตารางเฉพาะส่วนที่ "pending"
+        const pendingExamData = examData.filter(exam => exam.status === 'pending');
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // Define all elements once
+            const elements = {
+                pending: {
+                    body: document.getElementById('exam-table-body-pending'),
+                    count: document.getElementById('exam-count-pending'),
+                    date: document.getElementById('current-date-pending'),
+                    weekFilter: document.getElementById('week-filter-pending'),
+                    dateFilter: document.getElementById('date-filter-pending'),
+                    section: document.getElementById('pendingTableSection')
+                },
+                approved: {
+                    // ลบการอ้างอิงถึง element ของ approved ที่ไม่ใช้แล้ว
+                }
+            };
+
+            const modal = document.getElementById('examModal');
+
+            // กำหนดวันที่เริ่มต้นภาคเรียน (เพื่อให้คำนวณสัปดาห์ได้ถูกต้อง)
+            const startOfSemester = new Date('2025-09-01');
+
+            // --- Utility Functions ---
+            const formatDate = (dateString) => {
+                const options = {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                };
+                return new Date(dateString).toLocaleDateString('th-TH', options);
+            };
+
+            const getAcademicWeekNumber = (date) => {
+                const diffTime = Math.abs(date.getTime() - startOfSemester.getTime());
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return Math.floor(diffDays / 7) + 1;
+            };
+
+            const getWeekStartEnd = (week) => {
+                const startDate = new Date(startOfSemester);
+                startDate.setDate(startOfSemester.getDate() + (week - 1) * 7);
+                const endDate = new Date(startDate);
+                endDate.setDate(endDate.getDate() + 6);
+                return {
+                    startDate,
+                    endDate
+                };
+            };
+
+            const renderSummaryCards = (examCountId, currentDateId, filteredExams) => {
+                document.getElementById(examCountId).textContent = filteredExams.length;
+                document.getElementById(currentDateId).textContent = formatDate(new Date().toISOString().split('T')[0]);
+            };
+
+            // โค้ดแสดงตารางจะใช้แค่ข้อมูล pending เท่านั้น
+            const renderTable = (data, tabType) => {
+                const selectedWeek = elements[tabType].weekFilter.value;
+                const selectedDate = elements[tabType].dateFilter.value;
+                let filteredExams = data;
+
+                if (selectedDate) {
+                    filteredExams = data.filter(exam => exam.date === selectedDate);
+                } else if (selectedWeek) {
+                    const selectedWeekNumber = parseInt(selectedWeek, 10);
+                    filteredExams = data.filter(exam => {
+                        const examDate = new Date(exam.date);
+                        return getAcademicWeekNumber(examDate) === selectedWeekNumber;
+                    });
+                }
+
+                elements[tabType].body.innerHTML = '';
+                if (filteredExams.length === 0) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td colspan="4" class="px-6 py-4 text-center text-gray-500">ไม่มีตารางสอบในช่วงเวลาที่เลือก</td>`;
+                    elements[tabType].body.appendChild(row);
+                } else {
+                    filteredExams.forEach(exam => {
+                        const row = document.createElement('tr');
+                        const examIndex = examData.findIndex(e => e.project_th === exam.project_th);
+                        row.innerHTML = `
+                                <td class="px-6 py-4">${exam.project_th}</td>
+                                <td class="px-6 py-4">${formatDate(exam.date)}</td>
+                                <td class="px-6 py-4">${exam.time}</td>
+                                <td class="px-6 py-4">
+                                    <a href="#" class="btn-view-details" data-exam-index="${examIndex}">
+                                        ดูรายละเอียด
+                                    </a>
+                                </td>
+                            `;
+                        elements[tabType].body.appendChild(row);
+                    });
+                }
+                renderSummaryCards(`exam-count-${tabType}`, `current-date-${tabType}`, filteredExams);
+            };
+
+            // Event Listeners for Filters
+            elements.pending.weekFilter.addEventListener('change', () => {
+                elements.pending.dateFilter.value = '';
+                renderTable(pendingExamData, 'pending');
+            });
+            elements.pending.dateFilter.addEventListener('change', () => {
+                elements.pending.weekFilter.value = '';
+                renderTable(pendingExamData, 'pending');
+            });
+
+
+            // Generate week filter options for only 4 weeks
+            const generateWeekOptions = (filterElement) => {
+                for (let i = 1; i <= 4; i++) {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    const {
+                        startDate,
+                        endDate
+                    } = getWeekStartEnd(i);
+                    option.textContent = `สัปดาห์ที่ ${i} (${formatDate(startDate.toISOString().split('T')[0])} - ${formatDate(endDate.toISOString().split('T')[0])})`;
+                    filterElement.appendChild(option);
+                }
+            };
+            generateWeekOptions(elements.pending.weekFilter);
+
+
+            // Modal functionality
+            document.addEventListener('click', (e) => {
+                const btn = e.target.closest('.btn-view-details');
+                if (btn) {
+                    e.preventDefault();
+                    const index = btn.dataset.examIndex;
+                    const exam = examData[index];
+
+                    if (!exam) return;
+
+                    document.getElementById('exam-project-th').textContent = exam.project_th;
+                    document.getElementById('exam-project-en').textContent = exam.project_en;
+                    document.getElementById('exam-date').textContent = formatDate(exam.date);
+                    document.getElementById('exam-time').textContent = exam.time;
+                    document.getElementById('exam-location').textContent = exam.location;
+
+                    const studentsDiv = document.getElementById('exam-students');
+                    studentsDiv.innerHTML = '';
+                    exam.students.forEach(student => {
+                        const p = document.createElement('p');
+                        p.innerHTML = `<strong class="text-gray-700">ชื่อ:</strong> ${student.name} (${student.id})`;
+                        studentsDiv.appendChild(p);
+                    });
+
+                    const committeeDiv = document.getElementById('exam-committee');
+                    committeeDiv.innerHTML = '';
+                    exam.committee.forEach(member => {
+                        const p = document.createElement('p');
+                        p.innerHTML = `<strong class="text-gray-700">ชื่อ:</strong> ${member.name} (<span class="font-bold text-blue-600">${member.role}</span>)`;
+                        committeeDiv.appendChild(p);
+                    });
+
+                    modal.style.display = 'flex';
+                }
+            });
+
+            window.closeModal = () => {
+                modal.style.display = 'none';
+            };
+            window.onclick = (event) => {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            };
+
+            // Initial render
+            renderTable(pendingExamData, 'pending');
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+    // Get the sidebar and the open/close buttons
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOpenBtn = document.getElementById('sidebar-open-btn'); // Add a button to open the sidebar
+    const sidebarCloseBtn = document.getElementById('sidebar-close-btn');
+
+    // Function to open the sidebar
+    function openSidebar() {
+        sidebar.classList.remove('-left-full'); // Or whichever class you use to hide it
+        sidebar.classList.add('left-0');
+    }
+
+    // Function to close the sidebar
+    function closeSidebar() {
+        sidebar.classList.remove('left-0');
+        sidebar.classList.add('-left-full'); // Or whichever class you use to hide it
+    }
+
+    // Add a click event to the close button
+    if (sidebarCloseBtn) {
+        sidebarCloseBtn.addEventListener('click', closeSidebar);
+    }
+    
+    // Add a click event to an open button (you'll need to add this to your HTML)
+    if (sidebarOpenBtn) {
+        sidebarOpenBtn.addEventListener('click', openSidebar);
+    }
+
+    // แก้ไข: ปรับโค้ดการปิด sidebar เมื่อคลิกนอกพื้นที่
+    // เพิ่มเงื่อนไขว่าโค้ดนี้จะทำงานเฉพาะบนหน้าจอขนาดเล็กกว่า 1024px เท่านั้น
+    window.addEventListener('click', function(event) {
+        if (window.innerWidth < 1024) { // ตรวจสอบขนาดหน้าจอ
+            if (!sidebar.contains(event.target) && !event.target.closest('#sidebar-open-btn')) {
+                closeSidebar();
+            }
+        }
+    });
+
+    // Add responsive behavior based on screen size
+    function handleResize() {
+        if (window.innerWidth >= 1024) { // Tailwind's 'lg' breakpoint
+            sidebar.classList.remove('fixed', '-left-full');
+            sidebar.classList.add('relative', 'left-0');
+        } else {
+            sidebar.classList.remove('relative', 'left-0');
+            sidebar.classList.add('fixed', '-left-full');
+        }
+    }
+
+    // Run on page load and on window resize
+    handleResize();
+    window.addEventListener('resize', handleResize);
+});
+    </script>
+</body>
+
+</html>
